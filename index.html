@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Gastos</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        .btn-group-custom .btn {
+            width: 30%;
+        }
+        .btn-cycle {
+            transition: background-color 0.3s ease;
+        }
+        .table-container {
+            height: calc(100vh - 200px); /* Extiende la altura de la tabla */
+            overflow-y: auto;
+            width: 100%;
+        }
+        .month-separator {
+            font-weight: bold;
+            background-color: #f8f9fa;
+            padding: 0.5rem;
+            border-bottom: 1px solid #dee2e6;
+            text-align: center;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #ffffff;
+            border-top: 1px solid #dee2e6;
+            padding: 10px;
+            box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+        }
+        .balance-positive {
+            color: #28a745; /* Verde */
+        }
+        .balance-negative {
+            color: #dc3545; /* Rojo */
+        }
+        .gasto {
+            background-color: #f8d7da; /* Rosado */
+        }
+        .ingreso {
+            background-color: #d4edda; /* Verde claro */
+        }
+        .datepicker {
+            display: block;
+        }
+		
+
+    }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Barra de título con hamburguesa -->
+    <nav class="navbar navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOptions" aria-controls="navbarOptions" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <span class="navbar-brand mb-0 h1">Gestor de Gastos</span>
+        <div class="collapse navbar-collapse" id="navbarOptions">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="#">Cargar Backup</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Descargar Backup</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Cambiar Tema</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Recurrencias</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Operaciones</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Monedas</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Botones debajo de la barra de título -->
+    <div class="container mt-3">
+        <div class="btn-group btn-group-custom d-flex justify-content-around">
+            <button id="btn-movimiento" class="btn btn-secondary btn-cycle" onclick="cambiarMovimiento()">Gasto</button>
+            <button id="btn-tarjeta" class="btn btn-primary btn-cycle" onclick="cambiarTarjeta()">Visa</button>
+            <button id="btn-concepto" class="btn btn-info btn-cycle" onclick="cambiarConcepto()">Básico</button>
+        </div>
+    </div>
+
+    <!-- Tabla de Movimientos -->
+    <div class="container mt-4">
+        <div class="table-container">
+            <table class="table">
+                <tbody id="movimientos-tbody">
+                    <!-- Movimientos serán generados dinámicamente aquí -->
+                </tbody>
+            </table>
+            <p id="sin-movimientos" class="text-center text-muted">SIN MOVIMIENTOS</p>
+        </div>
+    </div>
+
+    <!-- Pie de página -->
+    <div class="footer">
+        <div class="container">
+            <div class="mb-3">
+                <h5>Balance: <span id="balance" class="balance-positive">0.00</span></h5>
+            </div>
+            <div class="input-group">
+                <button class="btn btn-outline-secondary" id="fecha-btn" data-toggle="modal" data-target="#fechaModal">
+					<i id="fecha-icon" class="fas fa-calendar-alt"></i>
+				</button>
+				<button class="btn btn-outline-secondary" onclick="resetearFecha()">
+                    <i class="fas fa-undo"></i> 
+                </button>
+                <input type="number" class="form-control" id="monto-input" placeholder="Monto del movimiento">
+                <div class="input-group-append">
+                    <button class="btn btn-success" onclick="agregarMovimiento()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para seleccionar fecha -->
+<div class="modal fade" id="fechaModal" tabindex="-1" role="dialog" aria-labelledby="fechaModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fechaModalLabel">Seleccionar Fecha</h5>                
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="date" id="fecha-selector" class="form-control">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="confirmarFecha()">Seleccionar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        // Datos iniciales
+        const tarjetas = ['Visa', 'Mastercard', 'American Express'];
+        const coloresTarjetas = ['#007bff', '#dc3545', '#28a745'];
+        const movimientos = ['Ingreso', 'Gasto'];
+        const coloresMovimientos = ['#28a745', '#dc3545'];
+        const conceptos = ['Básico', 'Gusto', 'Ahorro'];
+        const coloresConceptos = ['#17a2b8', '#ffc107', '#28a745'];
+
+        let tarjetaActual = 0;
+        let movimientoActual = 1;
+        let conceptoActual = 0;
+        let movimientosLista = [];
+        //let fechaSeleccionada = new Date().toISOString().split('T')[0]; // Fecha actual por defecto
+		let idCounter = 1; // Agregar esta variable al inicio del script}
+		// Al inicio del script, donde se declaran las variables globales
+let fechaSeleccionada = new Date().toISOString().split('T')[0];
+
+// Y agreguemos esto al final del script
+document.addEventListener('DOMContentLoaded', function() {
+    resetearFecha(); // Esto inicializará correctamente la fecha y actualizará el icono
+});
+		
+function actualizarIconoFecha() {
+    const fechaActual = new Date().toISOString().split('T')[0];
+    const iconoFecha = document.getElementById('fecha-icon');
+    
+    if (fechaSeleccionada !== fechaActual) {
+        iconoFecha.style.color = 'red';
+    } else {
+        iconoFecha.style.color = ''; // Restaurar color por defecto
+    }
+}
+		
+function resetearFecha() {
+    const hoy = new Date();
+    const hoyString = hoy.toISOString().split('T')[0];
+    document.getElementById('fecha-selector').value = hoyString;
+    fechaSeleccionada = hoyString;
+    actualizarIconoFecha();
+}
+
+        // Función para cambiar tarjeta
+function cambiarTarjeta() {
+    tarjetaActual = (tarjetaActual + 1) % tarjetas.length;
+    document.getElementById('btn-tarjeta').innerText = tarjetas[tarjetaActual];
+    document.getElementById('btn-tarjeta').style.backgroundColor = coloresTarjetas[tarjetaActual];
+    actualizarMovimientos(); // Actualiza la grilla y el balance al cambiar de tarjeta
+}
+
+function ordenarMovimientosPorFecha(movimientos) {
+    return movimientos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+}
+
+        // Función para cambiar movimiento
+function cambiarMovimiento() {
+    movimientoActual = (movimientoActual + 1) % movimientos.length;
+    const btnMovimiento = document.getElementById('btn-movimiento');
+    btnMovimiento.innerText = movimientos[movimientoActual];
+    btnMovimiento.style.backgroundColor = coloresMovimientos[movimientoActual];
+    btnMovimiento.style.color = 'white'; // Asegura que el texto sea siempre blanco
+}
+
+        // Función para cambiar concepto
+        function cambiarConcepto() {
+            conceptoActual = (conceptoActual + 1) % conceptos.length;
+            document.getElementById('btn-concepto').innerText = conceptos[conceptoActual];
+            document.getElementById('btn-concepto').style.backgroundColor = coloresConceptos[conceptoActual];
+        }
+
+        // Función para agregar movimiento
+// Modificar la función agregarMovimiento
+
+function agregarMovimiento() {
+    const monto = document.getElementById('monto-input').value;
+    if (monto && monto > 0) {
+        const nuevoMovimiento = {
+            id: idCounter++,
+            fecha: fechaSeleccionada, // Usamos directamente fechaSeleccionada
+            tipo: movimientos[movimientoActual],
+            monto: parseFloat(monto).toFixed(2),
+            concepto: conceptos[conceptoActual],
+            tarjeta: tarjetas[tarjetaActual]
+        };
+        movimientosLista.push(nuevoMovimiento);
+        actualizarMovimientos();
+        document.getElementById('monto-input').value = '';
+        $('#fechaModal').modal('hide');
+    }
+}
+
+        // Función para confirmar la fecha seleccionada
+function confirmarFecha() {
+    const fechaSeleccionadaInput = document.getElementById('fecha-selector').value;
+    if (fechaSeleccionadaInput) {
+        // Crear la fecha en la zona horaria local
+        const fechaLocal = new Date(fechaSeleccionadaInput + 'T00:00:00');
+        fechaSeleccionada = fechaLocal.toISOString().split('T')[0];
+    } else {
+        fechaSeleccionada = new Date().toISOString().split('T')[0];
+    }
+    actualizarIconoFecha();
+    $('#fechaModal').modal('hide');
+}
+
+        // Función para actualizar la tabla de movimientos
+function actualizarMovimientos() {
+    const tbody = document.getElementById('movimientos-tbody');
+    tbody.innerHTML = '';
+    document.getElementById('sin-movimientos').style.display = 'none';
+
+    // Filtrar movimientos por la tarjeta seleccionada
+    const movimientosFiltrados = movimientosLista.filter(m => m.tarjeta === tarjetas[tarjetaActual]);
+
+    if (movimientosFiltrados.length === 0) {
+        document.getElementById('sin-movimientos').style.display = 'block';
+        document.getElementById('balance').textContent = '0.00';
+        document.getElementById('balance').className = 'balance-positive';
+    } else {
+        let balance = 0;
+        let mesActual = '';
+
+        // Ordenar movimientos por fecha ascendente
+        const movimientosOrdenados = ordenarMovimientosPorFecha(movimientosFiltrados);
+
+        movimientosOrdenados.forEach(movimiento => {
+            const fecha = new Date(movimiento.fecha + 'T00:00:00'); // Aseguramos que la fecha se cree en la zona horaria local
+            const mes = fecha.toLocaleString('default', { month: 'long' });
+            const dia = fecha.getDate();
+            const claseFila = movimiento.tipo === 'Gasto' ? 'gasto' : 'ingreso';
+
+            if (mes !== mesActual) {
+                const filaMes = document.createElement('tr');
+                filaMes.className = 'month-separator';
+                filaMes.innerHTML = `<td colspan="5">${mes}</td>`;
+                tbody.appendChild(filaMes);
+                mesActual = mes;
+            }
+
+            const fila = document.createElement('tr');
+            fila.className = claseFila;
+            fila.dataset.id = movimiento.id;
+            fila.innerHTML = `
+                <td>${dia}</td>
+                <td>${movimiento.tipo}</td>
+                <td>${movimiento.concepto}</td>
+                <td>${movimiento.monto}</td>
+                <td><button class="btn btn-danger btn-sm" onclick="eliminarMovimiento(${movimiento.id})"><i class="fas fa-trash-alt"></i></button></td>
+            `;
+            tbody.appendChild(fila);
+
+            balance += movimiento.tipo === 'Ingreso' ? parseFloat(movimiento.monto) : -parseFloat(movimiento.monto);
+        });
+
+        document.getElementById('balance').textContent = balance.toFixed(2);
+        document.getElementById('balance').className = balance >= 0 ? 'balance-positive' : 'balance-negative';
+    }
+}
+
+        // Función para eliminar un movimiento
+function eliminarMovimiento(id) {
+    if (confirm('¿Estás seguro de que quieres eliminar este movimiento?')) {
+        // Encontrar y eliminar el movimiento correcto usando el ID
+        movimientosLista = movimientosLista.filter(movimiento => movimiento.id !== id);
+        actualizarMovimientos();
+    }
+}
+
+// Agregar esto al final del script, justo antes de cerrar la etiqueta 
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarIconoFecha();
+});
+
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{
+    "tarjetas": [
+      {
+        "cardId": 1,
+        "nombre": "Visa",
+        "tipo": "credito",
+        "color": "black",
+        "factura": 15,
+        "pago": 30,
+        "control": 0,
+        "parcial": 0,
+        "balance": 2500,
+        "activo": true
+      },
+      {
+        "cardId": 2,
+        "nombre": "Amex",
+        "tipo": "credito",
+        "color": "red",
+        "factura": 15,
+        "pago": 30,
+        "control": 0,
+        "parcial": 0,
+        "balance": 2500,
+        "activo": true
+      },
+      {
+        "cardId": 3,
+        "nombre": "Master",
+        "tipo": "credito",
+        "color": "blue",
+        "factura": 15,
+        "pago": 30,
+        "control": 700,
+        "parcial": 500,
+        "balance": 2500,
+        "activo": false
+      },
+      {
+        "cardId": 4,
+        "nombre": "BCP",
+        "tipo": "debito",
+        "color": "red",
+        "factura": 15,
+        "pago": 10,
+        "control": 0,
+        "parcial": 0,
+        "balance": 2500,
+        "activo": false
+      },
+      {
+        "cardId": 5,
+        "nombre": "Otro",
+        "tipo": "debito",
+        "color": "blue",
+        "factura": 15,
+        "pago": 10,
+        "control": 0,
+        "parcial": 0,
+        "balance": 2500,
+        "activo": false
+      }
+    ],
+    "conceptos": [
+      {
+        "conceptId": 1,
+        "nombre": "Sueldo",
+        "tipo_movimiento": "ingreso",
+        "color": "green",
+        "por_defecto": false,
+        "activo": true
+      },
+      {
+        "conceptId": 2,
+        "nombre": "Basico",
+        "tipo_movimiento": "egreso",
+        "color": "blue",
+        "por_defecto": true,
+        "activo": true
+      },
+      {
+        "conceptId": 3,
+        "nombre": "Gusto",
+        "tipo_movimiento": "egreso",
+        "color": "red",
+        "por_defecto": false,
+        "activo": true
+      },
+      {
+        "conceptId": 4,
+        "nombre": "Ahorro",
+        "tipo_movimiento": "egreso",
+        "color": "gray",
+        "por_defecto": false,
+        "activo": true
+      }
+    ]
+  }

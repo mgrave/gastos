@@ -1,0 +1,66 @@
+.btn-group-custom .btn {
+    width: 30%;
+  }
+
+  .btn-cycle {
+    transition: background-color 0.3s ease;
+  }
+
+  .table-container {
+    height: calc(100vh - 200px);
+    /* Extiende la altura de la tabla */
+    overflow-y: auto;
+    width: 100%;
+  }
+
+  .month-separator {
+    font-weight: bold;
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+    text-align: center;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border-top: 1px solid #dee2e6;
+    padding: 10px;
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .balance-positive {
+    color: #28a745;
+    /* Verde */
+  }
+
+  .balance-negative {
+    color: #dc3545;
+    /* Rojo */
+  }
+
+  .egreso {
+    background-color: #f8d7da;
+    /* Rosado */
+  }
+
+  .ingreso {
+    background-color: #d4edda;
+    /* Verde claro */
+  }
+
+  .factura {
+    background-color: gray;
+    /* Verde claro */
+  }
+
+  .pago {
+    background-color: #d4edda;
+    /* Verde claro */
+  }
+
+  .datepicker {
+    display: block;
+  }

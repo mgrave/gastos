@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor de Gastos</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <style>
+    .btn-group-custom .btn {
+      width: 30%;
+    }
+
+    .btn-cycle {
+      transition: background-color 0.3s ease;
+    }
+
+    .table-container {
+      height: calc(100vh - 200px);
+      /* Extiende la altura de la tabla */
+      overflow-y: auto;
+      width: 100%;
+    }
+
+    .month-separator {
+      font-weight: bold;
+      background-color: #f8f9fa;
+      padding: 0.5rem;
+      border-bottom: 1px solid #dee2e6;
+      text-align: center;
+    }
+
+    .footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #ffffff;
+      border-top: 1px solid #dee2e6;
+      padding: 10px;
+      box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .balance-positive {
+      color: #28a745;
+      /* Verde */
+    }
+
+    .balance-negative {
+      color: #dc3545;
+      /* Rojo */
+    }
+
+    .gasto {
+      background-color: #f8d7da;
+      /* Rosado */
+    }
+
+    .ingreso {
+      background-color: #d4edda;
+      /* Verde claro */
+    }
+
+    .datepicker {
+      display: block;
+    }
+
+    .factura-separator {
+      background-color: #6c757d;
+      /* Fondo gris */
+      color: white;
+      /* Texto blanco */
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body class="bg-light">
+  <!-- Barra de título con hamburguesa -->
+  <nav class="navbar navbar-dark bg-dark">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOptions"
+      aria-controls="navbarOptions" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <span class="navbar-brand mb-0 h1">Gestor de Gastos</span>
+    <div class="collapse navbar-collapse" id="navbarOptions">
+      <ul class="navbar-nav">
+        <li class="nav-item" id="tarjetas-menu">
+          <a class="nav-link" href="#">Tarjetas</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Cargar Backup</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#" onclick="descargarBackup()">Descargar Backup</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Cambiar Tema</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Recurrencias</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="#">Operaciones</a></li>
+        <li class="nav-item"><a class="nav-link" href="#">Monedas</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Botones debajo de la barra de título -->
+  <div class="container mt-3">
+    <div class="btn-group btn-group-custom d-flex justify-content-around">
+      <button id="btn-movimiento" class="btn btn-secondary btn-cycle" onclick="cambiarMovimiento()">
+        Gasto
+      </button>
+      <button id="btn-tarjeta" class="btn btn-primary btn-cycle" onclick="cambiarTarjeta()">
+        Visa
+      </button>
+      <button id="btn-concepto" class="btn btn-info btn-cycle" onclick="cambiarConcepto()">
+        Básico
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla de Movimientos -->
+  <div class="container mt-4">
+    <div class="table-container">
+      <table class="table">
+        <tbody id="movimientos-tbody">
+          <!-- Movimientos serán generados dinámicamente aquí -->
+        </tbody>
+      </table>
+      <p id="sin-movimientos" class="text-center text-muted">
+        SIN MOVIMIENTOS
+      </p>
+    </div>
+  </div>
+
+  <!-- Pie de página -->
+  <div class="footer">
+    <div class="container">
+      <div class="mb-3">
+        <h5>
+          Balance: <span id="balance" class="balance-positive">0.00</span>
+        </h5>
+      </div>
+      <div class="input-group">
+        <button class="btn btn-outline-secondary" id="fecha-btn" data-toggle="modal" data-target="#fechaModal">
+          <i id="fecha-icon" class="fas fa-calendar-alt"></i>
+        </button>
+        <button class="btn btn-outline-secondary" id="cuotas" onclick="resetearFecha()">
+          <i class="fas fa-undo"></i>
+        </button>
+        <input type="number" class="form-control" id="monto-input" placeholder="Monto del movimiento" />
+        <div class="input-group-append">
+          <button class="btn btn-success" onclick="agregarMovimiento()">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para seleccionar fecha -->
+  <div class="modal fade" id="fechaModal" tabindex="-1" role="dialog" aria-labelledby="fechaModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="fechaModalLabel">Seleccionar Fecha</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="date" id="fecha-selector" class="form-control" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" onclick="resetearFecha()" data-dismiss="modal">
+            Restaurar
+          </button>
+          <button type="button" class="btn btn-primary" onclick="confirmarFecha()">
+            Seleccionar
+          </button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para tarjetas -->
+  <div class="modal fade" id="tarjetasModal" tabindex="-1" role="dialog" aria-labelledby="tarjetasModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tarjetasModalLabel">Tarjetas</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Contenido del modal -->
+          <div id="tarjetas-lista"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Cerrar
+          </button>
+          <button type="button" class="btn btn-primary" id="agregar-tarjeta-btn">
+            Agregar tarjeta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var dataJson = {
+      tarjetas: [
+        {
+          cardId: 1,
+          nombre: "Visa",
+          tipo: "credito",
+          color: "black",
+          factura: "10",
+          pago: "10",
+          control: 0,
+          parcial: 0,
+          balance: 2500,
+          activo: true,
+        },
+        {
+          cardId: 2,
+          nombre: "Amex",
+          tipo: "credito",
+          color: "red",
+          factura: "15",
+          pago: "10",
+          control: 0,
+          parcial: 0,
+          balance: 2500,
+          activo: true,
+        },
+        {
+          cardId: 3,
+          nombre: "Master",
+          tipo: "credito",
+          color: "blue",
+          factura: "15",
+          pago: "10",
+          control: 700,
+          parcial: 500,
+          balance: 2500,
+          activo: true,
+        },
+        {
+          cardId: 4,
+          nombre: "BCP",
+          tipo: "debito",
+          color: "red",
+          factura: "15",
+          pago: "10",
+          control: 0,
+          parcial: 0,
+          balance: 2500,
+          activo: true,
+        },
+        {
+          cardId: 5,
+          nombre: "Otro",
+          tipo: "debito",
+          color: "blue",
+          factura: "15",
+          pago: "10",
+          control: 0,
+          parcial: 0,
+          balance: 2500,
+          activo: true,
+        },
+      ],
+      conceptos: [
+        {
+          conceptId: 1,
+          nombre: "Sueldo",
+          tipo_movimiento: "ingreso",
+          color: "green",
+          por_defecto: false,
+          activo: true,
+        },
+        {
+          conceptId: 2,
+          nombre: "Basico",
+          tipo_movimiento: "egreso",
+          color: "blue",
+          por_defecto: true,
+          activo: true,
+        },
+        {
+          conceptId: 3,
+          nombre: "Gusto",
+          tipo_movimiento: "egreso",
+          color: "red",
+          por_defecto: false,
+          activo: true,
+        },
+        {
+          conceptId: 4,
+          nombre: "Ahorro",
+          tipo_movimiento: "egreso",
+          color: "gray",
+          por_defecto: false,
+          activo: true,
+        },
+      ],
+    };
+
+    // Datos iniciales
+    const tarjetas = dataJson.tarjetas.filter((tarjeta) => tarjeta.activo);
+    //const tarjetas = dataJson.tarjetas.map((tarjeta) => tarjeta);
+    const tipoMovimiento = [
+      {
+        tipo: "ingreso",
+        color: "#28a745",
+        alias: "Income",
+      },
+      {
+        tipo: "egreso",
+        color: "#dc3545",
+        alias: "Expense",
+      },
+    ];
+
+    let conceptosAll = dataJson.conceptos.filter(
+      (conceptos) => conceptos.activo
+    );
+
+    let tarjetaPivot = 4;
+    let movimientoPivot = 0;
+    let conceptoPivot = 0;
+    let movimientos = [];
+    let conceptos = [];
+    let idCounter = 1;
+    let fechaSeleccionada = new Date().toISOString().split("T")[0];
+
+    function actualizarIconoFecha() {
+      const fechaActual = new Date().toISOString().split("T")[0];
+      const iconoFecha = document.getElementById("fecha-icon");
+
+      if (fechaSeleccionada !== fechaActual) {
+        iconoFecha.style.color = "red";
+      } else {
+        iconoFecha.style.color = ""; // Restaurar color por defecto
+      }
+    }
+
+    function resetearFecha() {
+      const hoy = new Date();
+      const hoyString = hoy.toISOString().split("T")[0];
+      document.getElementById("fecha-selector").value = hoyString;
+      fechaSeleccionada = hoyString;
+      actualizarIconoFecha();
+    }
+
+    // Función para cambiar tarjeta
+    function cambiarTarjeta() {
+      // Get active cards by filtering tarjetas based on `activo` flag
+      tarjetaPivot = (tarjetaPivot + 1) % tarjetas.length;
+      const tarjetaSeleccionada = tarjetas[tarjetaPivot];
+      document.getElementById("btn-tarjeta").innerText =
+        tarjetaSeleccionada.nombre;
+      document.getElementById("btn-tarjeta").style.backgroundColor =
+        tarjetaSeleccionada.color;
+      actualizarMovimientos(); // Update grid and balance when changing the card
+    }
+
+    // Función para cambiar movimiento
+    function cambiarMovimiento() {
+      movimientoPivot = (movimientoPivot + 1) % tipoMovimiento.length; // Alterna entre "ingreso" y "egreso"
+      const btnMovimiento = document.getElementById("btn-movimiento");
+      btnMovimiento.innerText = tipoMovimiento[movimientoPivot].alias;
+      btnMovimiento.style.backgroundColor =
+        tipoMovimiento[movimientoPivot].color;
+      btnMovimiento.style.color = "white";
+      conceptos = conceptosAll.filter(
+        (c) => c.tipo_movimiento === tipoMovimiento[movimientoPivot].tipo
+      );
+      cambiarConcepto();
+    }
+
+    // Función para cambiar concepto
+    function cambiarConcepto() {
+      conceptoPivot = (conceptoPivot + 1) % conceptos.length;
+      const conceptoSeleccionado = conceptos[conceptoPivot];
+      document.getElementById("btn-concepto").innerText =
+        conceptoSeleccionado.nombre;
+      document.getElementById("btn-concepto").style.backgroundColor =
+        conceptoSeleccionado.color;
+    }
+
+    // Función para agregar movimiento
+    // Modificar la función agregarMovimiento
+
+    function agregarMovimiento() {
+      const monto = document.getElementById("monto-input").value;
+      if (monto && monto > 0) {
+        const nuevoMovimiento = {
+          movId: idCounter++,
+          fecha: fechaSeleccionada, // Use directly `fechaSeleccionada`
+          tipo: tipoMovimiento[movimientoPivot].tipo, // Use the current movement type
+          monto: parseFloat(monto).toFixed(2),
+          concepto: conceptos[conceptoPivot].conceptId, // Use the concept ID
+          tarjeta: tarjetas[tarjetaPivot].cardId, // Use the card ID
+          detalle: "",
+        };
+        //console.log(nuevoMovimiento);
+        movimientos.push(nuevoMovimiento);
+        actualizarMovimientos(); // Update movements and balance
+        document.getElementById("monto-input").value = "";
+        $("#fechaModal").modal("hide");
+      }
+    }
+
+    // Función para confirmar la fecha seleccionada
+    function confirmarFecha() {
+      const fechaSeleccionadaInput =
+        document.getElementById("fecha-selector").value;
+      if (fechaSeleccionadaInput) {
+        // Crear la fecha en la zona horaria local
+        const fechaLocal = new Date(fechaSeleccionadaInput + "T00:00:00");
+        fechaSeleccionada = fechaLocal.toISOString().split("T")[0];
+      } else {
+        fechaSeleccionada = new Date().toISOString().split("T")[0];
+      }
+      actualizarIconoFecha();
+      $("#fechaModal").modal("hide");
+    }
+
+
+
+
+
+
+
+    // Función para actualizar la tabla de movimientosfunction actualizarMovimientos() {
+
+    function actualizarMovimientos() {
+    const tbody = document.getElementById("movimientos-tbody");
+    tbody.innerHTML = "";
+    document.getElementById("sin-movimientos").style.display = "none";
+
+    const tarjetaSeleccionada = tarjetas[tarjetaPivot];
+
+    // Filtrar movimientos por la tarjeta seleccionada
+    const movimientosFiltrados = movimientos.filter(
+        (m) => m.tarjeta === tarjetaSeleccionada.cardId
+    );
+
+    if (movimientosFiltrados.length === 0) {
+        document.getElementById("sin-movimientos").style.display = "block";
+        document.getElementById("balance").textContent = "0.00";
+        document.getElementById("balance").className = "balance-positive";
+    } else {
+        let balance = 0;
+        let mesActual = "";
+        let facturacionSubtotal = 0;
+        let mesSiguiente = "";
+        let facturacionMostrada = false;
+
+        // Ordenar movimientos por fecha ascendente
+        const movimientosOrdenados = ordenarMovimientosPorFecha(movimientosFiltrados);
+
+        // Determinar el mes siguiente a la fecha actual
+        const fechaActual = new Date();
+        mesSiguiente = new Date(fechaActual.getFullYear(), fechaActual.getMonth() + 1, 1).toLocaleDateString("es-ES", { year: "numeric", month: "long" });
+
+        movimientosOrdenados.forEach((movimiento, index) => {
+            const fecha = new Date(movimiento.fecha + "T00:00:00");
+            const mes = fecha.toLocaleDateString("es-ES", { year: "numeric", month: "long" });
+
+            // Agregar separador de mes si cambia
+            if (mes !== mesActual) {
+                // Insertar separador de facturación para el mes anterior si es necesario
+                if (tarjetaSeleccionada.tipo === "credito" && mesActual === mesSiguiente && !facturacionMostrada) {
+                    const trFactura = document.createElement("tr");
+                    const tdFactura = document.createElement("td");
+                    tdFactura.colSpan = 4;
+                    tdFactura.className = "factura-separator bg-dark text-white font-weight-bold";
+                    tdFactura.textContent = `[${tarjetaSeleccionada.factura} - Facturación: ${facturacionSubtotal.toFixed(2)}]`;
+                    trFactura.appendChild(tdFactura);
+                    tbody.appendChild(trFactura);
+                }
+
+                // Agregar separador de mes
+                const trMes = document.createElement("tr");
+                const tdMes = document.createElement("td");
+                tdMes.colSpan = 4;
+                tdMes.className = "month-separator";
+                tdMes.textContent = mes;
+                trMes.appendChild(tdMes);
+                tbody.appendChild(trMes);
+
+                mesActual = mes;
+
+                // Resetear el subtotal de facturación para el nuevo mes
+                facturacionSubtotal = 0;
+                facturacionMostrada = false; // Resetear para el nuevo mes
+            }
+
+            // Verificar si es tarjeta de crédito y acumular subtotal de facturación
+            if (tarjetaSeleccionada.tipo === "credito") {
+                const diaFactura = parseInt(tarjetaSeleccionada.factura, 10);
+                const fechaFacturacion = new Date(fecha.getFullYear(), fecha.getMonth(), diaFactura);
+
+                if (fecha >= fechaFacturacion) {
+                    facturacionSubtotal += parseFloat(movimiento.monto);
+                }
+            }
+
+            // Crear la fila del movimiento
+            const tr = document.createElement("tr");
+            tr.className = movimiento.tipo === "ingreso" ? "ingreso" : "gasto";
+
+            const tdFecha = document.createElement("td");
+            tdFecha.textContent = fecha.toLocaleDateString("es-ES");
+
+            const tdConcepto = document.createElement("td");
+            const concepto = conceptosAll.find((c) => c.conceptId === movimiento.concepto);
+            tdConcepto.textContent = concepto ? concepto.nombre : "Sin concepto";
+
+            const tdMonto = document.createElement("td");
+            tdMonto.textContent = parseFloat(movimiento.monto).toFixed(2);
+            tdMonto.className = movimiento.tipo === "ingreso" ? "text-success" : "text-danger";
+
+            tr.appendChild(tdFecha);
+            tr.appendChild(tdConcepto);
+            tr.appendChild(tdMonto);
+
+            // Agregar botón de eliminar
+            const tdEliminar = document.createElement("td");
+            tdEliminar.innerHTML = `<button class="btn btn-danger btn-sm" onclick="eliminarMovimiento(${movimiento.movId})">
+                <i class="fas fa-trash-alt"></i>
+            </button>`;
+            tr.appendChild(tdEliminar);
+
+            tbody.appendChild(tr);
+
+            // Calcular balance
+            balance += movimiento.tipo === "ingreso"
+                ? parseFloat(movimiento.monto)
+                : -parseFloat(movimiento.monto);
+
+            // Mostrar separador de facturación al final del mes actual si el último movimiento es del mismo mes
+            if (index === movimientosOrdenados.length - 1 && tarjetaSeleccionada.tipo === "credito") {
+                if (!facturacionMostrada && mes === mesActual) {
+                    const trFactura = document.createElement("tr");
+                    const tdFactura = document.createElement("td");
+                    tdFactura.colSpan = 4;
+                    tdFactura.className = "factura-separator bg-dark text-white font-weight-bold";
+                    tdFactura.textContent = `[${tarjetaSeleccionada.factura} - Facturación: ${facturacionSubtotal.toFixed(2)}]`;
+                    trFactura.appendChild(tdFactura);
+                    tbody.appendChild(trFactura);
+                    facturacionMostrada = true;
+                }
+            }
+        });
+
+        // Actualizar el balance en pantalla
+        const balanceElemento = document.getElementById("balance");
+        balanceElemento.textContent = balance.toFixed(2);
+        balanceElemento.className = balance >= 0 ? "balance-positive" : "balance-negative";
+
+        // Actualizar el saldo en el JSON de la tarjeta seleccionada
+        tarjetaSeleccionada.balance = balance;
+        tarjetaSeleccionada.parcial = facturacionSubtotal.toFixed(2); // Guardar el subtotal en 'parcial'
+    }
+}
+
+
+
+
+
+
+
+
+
+    function ordenarMovimientosPorFecha(movimientosFiltrados) {
+      return movimientosFiltrados.sort(
+        (a, b) => new Date(a.fecha) - new Date(b.fecha)
+      );
+    }
+
+    // Función para eliminar un movimiento
+    function eliminarMovimiento(movId) {
+      if (confirm("¿Estás seguro de que quieres eliminar este movimiento?")) {
+        // Encontrar y eliminar el movimiento correcto usando el ID
+        movimientos = movimientos.filter(
+          (movimiento) => movimiento.movId !== movId
+        );
+        actualizarMovimientos();
+      }
+    }
+
+    function descargarBackup() {
+      const datos = {
+        tarjetas: tarjetas,
+        conceptos: conceptos,
+        movimientos: movimientos,
+      };
+
+      const json = JSON.stringify(datos, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "backup.json";
+      a.click();
+    }
+
+    // Agrega evento click al menú de lista
+    document
+      .querySelector("#tarjetas-menu")
+      .addEventListener("click", function () {
+        $("#tarjetasModal").modal("show");
+      });
+
+    // Función para renderizar la lista de tarjetas
+    function renderizarTarjetas() {
+      const tarjetasLista = document.getElementById("tarjetas-lista");
+      tarjetasLista.innerHTML = "";
+
+      // Obtén la lista de tarjetas desde tu base de datos o API
+      //const tarjetas = obtenerTarjetas();
+
+      tarjetas.forEach((tarjeta) => {
+        const desplegable = document.createElement("div");
+        desplegable.classList.add("accordion");
+
+        const titulo = document.createElement("div");
+        titulo.classList.add("accordion-title");
+        titulo.textContent = tarjeta.nombre;
+
+        const contenido = document.createElement("div");
+        contenido.classList.add("accordion-content");
+        contenido.innerHTML = `
+                <p>ID: ${tarjeta.id}</p>
+                <p>Nombre: ${tarjeta.nombre}</p>
+                <button class="btn btn-danger" onclick="eliminarTarjeta(${tarjeta.id})">Eliminar</button>
+                <button class="btn btn-primary" onclick="modificarTarjeta(${tarjeta.id})">Modificar</button>
+                `;
+
+        desplegable.appendChild(titulo);
+        desplegable.appendChild(contenido);
+
+        tarjetasLista.appendChild(desplegable);
+      });
+    }
+
+    // Función para agregar tarjeta
+    function agregarTarjeta() {
+      const nombre = prompt("Ingrese el nombre de la tarjeta");
+      const tarjeta = { nombre };
+
+      // Agrega la tarjeta a tu base de datos o API
+      agregarTarjetaAPI(tarjeta);
+
+      renderizarTarjetas();
+    }
+
+    // Función para eliminar tarjeta
+    function eliminarTarjeta(id) {
+      // Elimina la tarjeta de tu base de datos o API
+      eliminarTarjetaAPI(id);
+
+      renderizarTarjetas();
+    }
+
+    // Función para modificar tarjeta
+    function modificarTarjeta(id) {
+      const nombre = prompt("Ingrese el nuevo nombre de la tarjeta");
+      const tarjeta = { id, nombre };
+
+      // Modifica la tarjeta en tu base de datos o API
+      modificarTarjetaAPI(tarjeta);
+
+      renderizarTarjetas();
+    }
+
+    // Agregar esto al final del script, justo antes de cerrar la etiqueta
+    document.addEventListener("DOMContentLoaded", function () {
+      resetearFecha(); // Esto inicializará correctamente la fecha y actualizará el icono
+      actualizarIconoFecha();
+      cambiarMovimiento();
+      cambiarTarjeta();
+    });
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

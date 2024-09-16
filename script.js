@@ -452,7 +452,7 @@ const calcularEstadoCuenta = (movimientosInput) => {
             tipo: "factura",
             monto: saldoPendienteMesAnterior, // Asignar el monto de parcial
             tarjeta: tarjetaSeleccionada.cardId, // Usar la tarjeta seleccionada
-            detalle: "Fecha Pago "+fechaPago
+            detalle: "Vence "+fechaPago
         };
 
         if (tarjetaSeleccionada.tipo === "credito") {

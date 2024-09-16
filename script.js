@@ -193,7 +193,7 @@ function cambiarTarjeta() {
         tarjetaSeleccionada.color;
 
     const tipoTarjeta = document.getElementById('tipoTarjeta');
-    console.log("T SELECC "+tarjetaSeleccionada.tipo);
+    console.log("T SELECC " + tarjetaSeleccionada.tipo);
     tipoTarjeta.textContent = tarjetaSeleccionada.tipo === 'credito' ? 'T. Crédito' : 'T. Débito';
 
     actualizarMovimientos(); // Update grid and balance when changing the card
@@ -210,13 +210,6 @@ function cambiarMovimiento() {
     conceptos = conceptosActivos.filter(
         (c) => c.tipo_movimiento === tipoMovimientoActivos[movimientoPivot].tipo
     );
-    
-    conceptoPivot = (conceptoPivot + 1) % conceptos.length;
-    const conceptoSeleccionado = conceptos[conceptoPivot];
-    document.getElementById("btn-concepto").innerText =
-        conceptoSeleccionado.nombre;
-    document.getElementById("btn-concepto").style.backgroundColor =
-        conceptoSeleccionado.color;
 
     const btnGuardar = document.querySelector('button[onclick="agregarMovimiento()"]');
     if (tipoMovimientoActivos[movimientoPivot].tipo === 'egreso') {
@@ -227,8 +220,18 @@ function cambiarMovimiento() {
         btnGuardar.classList.add('btn-success');
     }
     
+    cambiarConcepto();
     resetearOpciones();
 
+}
+
+function cambiarConcepto(){
+    conceptoPivot = (conceptoPivot + 1) % conceptos.length;
+    const conceptoSeleccionado = conceptos[conceptoPivot];
+    document.getElementById("btn-concepto").innerText =
+        conceptoSeleccionado.nombre;
+    document.getElementById("btn-concepto").style.backgroundColor =
+        conceptoSeleccionado.color;
 }
 
 // Función para agregar movimiento
@@ -292,7 +295,7 @@ function actualizarMovimientos() {
         // Ordenar movimientos por fecha
         const movimientosOrdenados = calcularEstadoCuenta(movimientosFiltrados);
 
-        dataJson.movimientos = movimientosOrdenados;        
+        dataJson.movimientos = movimientosOrdenados;
 
         movimientosOrdenados.forEach((movimiento) => {
             const fecha = new Date(movimiento.fecha + "T00:00:00");
@@ -393,8 +396,8 @@ const calcularEstadoCuenta = (movimientosInput) => {
         const mes = fecha.getMonth();
         const año = fecha.getFullYear();
         let mesAno = `${año}-${mes}`; // YYYY-MM 
-        
-        if(dia >= diaCorte){
+
+        if (dia >= diaCorte) {
             mesAno = `${año}-${mes + 1}`; // YYYY-MM 
         }
 
@@ -452,7 +455,7 @@ const calcularEstadoCuenta = (movimientosInput) => {
             tipo: "factura",
             monto: saldoPendienteMesAnterior, // Asignar el monto de parcial
             tarjeta: tarjetaSeleccionada.cardId, // Usar la tarjeta seleccionada
-            detalle: "Vence "+fechaPago
+            detalle: "Vence " + fechaPago
         };
 
         if (tarjetaSeleccionada.tipo === "credito") {
@@ -516,7 +519,7 @@ function descargarBackup() {
     };
 
     const json = JSON.stringify(datos, null, 2);
-    const blob = new Blob([json], { type: "application/json" });        
+    const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -526,33 +529,33 @@ function descargarBackup() {
 
 // Guarda información en el localStorage
 function guardarEstado() {
-    console.log("Guardando estado...")   
-    console.log("MOVIM EN DATAJSON " +JSON.stringify(dataJson, null, 2))
+    console.log("Guardando estado...")
+    console.log("MOVIM EN DATAJSON " + JSON.stringify(dataJson, null, 2))
     const data = {
         //tarjetas: tarjetas,
         //conceptos: conceptos,
-        movimientos: movimientos        
+        movimientos: movimientos
     };
     localStorage.setItem('data', JSON.stringify(data));
-    
-    
-    
-  }
-  
-  // Carga la información del localStorage
-  function cargarEstado() {
+
+
+
+}
+
+// Carga la información del localStorage
+function cargarEstado() {
     console.log("Recuperando estado...")
-    
+
     estadoGuardado = localStorage.getItem('data');
     if (estadoGuardado) {
         estado = JSON.parse(estadoGuardado);
-      //tarjetas = estado.tarjetas;
-      //conceptos = estado.conceptos;
-      movimientos = estado.movimientos;
-      //dataJson = estado.dataJson;
-      // Agrega aquí cualquier otra información que necesites restaurar
+        //tarjetas = estado.tarjetas;
+        //conceptos = estado.conceptos;
+        movimientos = estado.movimientos;
+        //dataJson = estado.dataJson;
+        // Agrega aquí cualquier otra información que necesites restaurar
     }
-  }
+}
 
 
 // Agrega evento click al menú de lista
@@ -627,10 +630,10 @@ function modificarTarjeta(id) {
 // Agregar esto al final del script, justo antes de cerrar la etiqueta
 document.addEventListener("DOMContentLoaded", function () {
     cargarEstado();
-    
+
     resetearOpciones(); // Esto inicializará correctamente la fecha y actualizará el icono
     actualizarIconoFecha();
     cambiarMovimiento();
     cambiarTarjeta();
-    
+
 });

@@ -5,8 +5,8 @@ var dataJson = {
             "nombre": "Visa",
             "tipo": "credito",
             "color": "black",
-            "factura": 15,
-            "pago": 30,
+            "factura": 12,
+            "pago": 10,
             "control": 0,
             "parcial": 0,
             "balance": 2500,
@@ -17,7 +17,7 @@ var dataJson = {
             "nombre": "Amex",
             "tipo": "credito",
             "color": "red",
-            "factura": 15,
+            "factura": 16,
             "pago": 30,
             "control": 0,
             "parcial": 0,
@@ -29,7 +29,7 @@ var dataJson = {
             "nombre": "Master",
             "tipo": "credito",
             "color": "blue",
-            "factura": 15,
+            "factura": 16,
             "pago": 30,
             "control": 700,
             "parcial": 500,
@@ -41,7 +41,7 @@ var dataJson = {
             "nombre": "BCP",
             "tipo": "debito",
             "color": "red",
-            "factura": 15,
+            "factura": 16,
             "pago": 10,
             "control": 0,
             "parcial": 0,
@@ -50,10 +50,10 @@ var dataJson = {
         },
         {
             "cardId": 5,
-            "nombre": "Otro",
+            "nombre": "Prestamo",
             "tipo": "debito",
             "color": "blue",
-            "factura": 15,
+            "factura": 16,
             "pago": 10,
             "control": 0,
             "parcial": 0,
@@ -118,7 +118,7 @@ const dataConf = {
         {
             tipo: "factura",
             class: "factura",
-            alias: "Facturacion",
+            alias: "Factura",
             activo: false,
         },
         {
@@ -157,11 +157,28 @@ function actualizarIconoFecha() {
     }
 }
 
-function resetearFecha() {
+// Función para confirmar la fecha seleccionada
+function confirmarOpciones() {
+    const fechaSeleccionadaInput =
+        document.getElementById("fecha-selector").value;
+    if (fechaSeleccionadaInput) {
+        // Crear la fecha en la zona horaria local
+        const fechaLocal = new Date(fechaSeleccionadaInput + "T00:00:00");
+        fechaSeleccionada = fechaLocal.toISOString().split("T")[0];
+    } else {
+        fechaSeleccionada = new Date().toISOString().split("T")[0];
+    }
+    actualizarIconoFecha();
+    $("#fechaModal").modal("hide");
+}
+
+function resetearOpciones() {
     const hoy = new Date();
     const hoyString = hoy.toISOString().split("T")[0];
     document.getElementById("fecha-selector").value = hoyString;
     fechaSeleccionada = hoyString;
+    const nroCuotas = document.getElementById("cuotas-selector");
+    nroCuotas.value = 1;
     actualizarIconoFecha();
 }
 
@@ -182,9 +199,6 @@ function cambiarTarjeta() {
     actualizarMovimientos(); // Update grid and balance when changing the card
 }
 
-
-
-
 // Función para cambiar movimiento
 function cambiarMovimiento() {
     movimientoPivot = (movimientoPivot + 1) % tipoMovimientoActivos.length; // Alterna entre "ingreso" y "egreso"
@@ -196,21 +210,14 @@ function cambiarMovimiento() {
     conceptos = conceptosActivos.filter(
         (c) => c.tipo_movimiento === tipoMovimientoActivos[movimientoPivot].tipo
     );
-    cambiarConcepto();
-    cambiarColorBoton();
-}
-
-// Función para cambiar concepto
-function cambiarConcepto() {
+    
     conceptoPivot = (conceptoPivot + 1) % conceptos.length;
     const conceptoSeleccionado = conceptos[conceptoPivot];
     document.getElementById("btn-concepto").innerText =
         conceptoSeleccionado.nombre;
     document.getElementById("btn-concepto").style.backgroundColor =
         conceptoSeleccionado.color;
-}
 
-function cambiarColorBoton() {
     const btnGuardar = document.querySelector('button[onclick="agregarMovimiento()"]');
     if (tipoMovimientoActivos[movimientoPivot].tipo === 'egreso') {
         btnGuardar.classList.remove('btn-success');
@@ -219,45 +226,48 @@ function cambiarColorBoton() {
         btnGuardar.classList.remove('btn-danger');
         btnGuardar.classList.add('btn-success');
     }
+    
+    resetearOpciones();
+
 }
 
 // Función para agregar movimiento
-// Modificar la función agregarMovimiento
 
 function agregarMovimiento() {
     const monto = document.getElementById("monto-input").value;
-    if (monto && monto > 0) {
-        const nuevoMovimiento = {
-            movId: idCounter++,
-            fecha: fechaSeleccionada, // Use directly `fechaSeleccionada`
-            tipo: tipoMovimientoActivos[movimientoPivot].tipo, // Use the current movement type
-            monto: parseFloat(monto).toFixed(2),
-            concepto: conceptos[conceptoPivot].conceptId, // Use the concept ID
-            tarjeta: tarjetas[tarjetaPivot].cardId, // Use the card ID
-            detalle: "",
-        };
-        //console.log(nuevoMovimiento);
-        movimientos.push(nuevoMovimiento);
-        actualizarMovimientos(); // Update movements and balance
-        document.getElementById("monto-input").value = "";
-        $("#fechaModal").modal("hide");
+    const cuotas = document.getElementById("cuotas-selector").value || 1; // Obtener el valor de cuotas, por defecto 1
+    const montoPorCuota = parseFloat(monto / cuotas).toFixed(2); // Monto dividido entre cuotas (o total si es 1)
+    const fechaSeleccionada = document.getElementById("fecha-selector").value || new Date().toISOString().split('T')[0]; // Si no hay fecha seleccionada, usar la fecha actual
+
+    if (monto && monto > 0) { // Validar que el monto sea válido
+        // Iterar por cada cuota y generar un movimiento para cada una
+        for (let i = 0; i < cuotas; i++) {
+            const fechaCuota = new Date(fechaSeleccionada); // Crear una nueva fecha basada en la fecha seleccionada o actual
+            fechaCuota.setMonth(fechaCuota.getMonth() + i); // Aumentar la fecha en meses según la cuota
+
+            const nuevoMovimiento = {
+                movId: idCounter++, // Identificador único
+                fecha: fechaCuota.toISOString().split('T')[0], // Formato de fecha en YYYY-MM-DD
+                tipo: tipoMovimientoActivos[movimientoPivot].tipo, // Tipo de movimiento actual
+                monto: montoPorCuota, // Monto dividido entre cuotas (o monto total si cuotas es 1)
+                concepto: conceptos[conceptoPivot].conceptId, // Concepto seleccionado
+                tarjeta: tarjetas[tarjetaPivot].cardId, // Tarjeta seleccionada
+                detalle: cuotas > 1 ? `Cuota ${i + 1}/${cuotas}` : "Pago único", // Detalle dependiendo si hay cuotas
+            };
+
+            movimientos.push(nuevoMovimiento); // Agregar el nuevo movimiento
+        }
+
+        actualizarMovimientos(); // Actualizar los movimientos y el balance
+        document.getElementById("monto-input").value = ""; // Limpiar el input de monto
+        $("#fechaModal").modal("hide"); // Cerrar el modal de selección de fecha
+    } else {
+        alert("Por favor, ingrese un monto válido.");
     }
 }
 
-// Función para confirmar la fecha seleccionada
-function confirmarFecha() {
-    const fechaSeleccionadaInput =
-        document.getElementById("fecha-selector").value;
-    if (fechaSeleccionadaInput) {
-        // Crear la fecha en la zona horaria local
-        const fechaLocal = new Date(fechaSeleccionadaInput + "T00:00:00");
-        fechaSeleccionada = fechaLocal.toISOString().split("T")[0];
-    } else {
-        fechaSeleccionada = new Date().toISOString().split("T")[0];
-    }
-    actualizarIconoFecha();
-    $("#fechaModal").modal("hide");
-}
+
+
 
 // Función para actualizar la tabla de movimientos
 function actualizarMovimientos() {
@@ -322,6 +332,9 @@ function actualizarMovimientos() {
             const tdConcepto = document.createElement("td");
             tdConcepto.textContent = concepto ? concepto.nombre : tipoMovimiento.alias;
 
+            const tdDetalle = document.createElement("td");
+            tdDetalle.textContent = movimiento.detalle;
+
             const tdMonto = document.createElement("td");
             tdMonto.textContent = parseFloat(movimiento.monto).toFixed(2);
             tdMonto.className =
@@ -333,6 +346,7 @@ function actualizarMovimientos() {
 
             tr.appendChild(tdFecha);
             tr.appendChild(tdConcepto);
+            tr.appendChild(tdDetalle);
             tr.appendChild(tdMonto);
 
             // Agregar botón de eliminar
@@ -374,10 +388,15 @@ const calcularEstadoCuenta = (movimientosInput) => {
 
     // Iterar sobre los movimientos para llenar el estado de cuenta
     movimientos.forEach(m => {
-        const fecha = new Date(m.fecha);
+        const fecha = new Date(m.fecha + 'T00:00:00'); // Añadir 'T00:00:00' para especificar la medianoche en UTC
+        const dia = fecha.getDate();
         const mes = fecha.getMonth();
         const año = fecha.getFullYear();
-        const mesAno = `${año}-${mes + 1}`; // YYYY-MM
+        let mesAno = `${año}-${mes}`; // YYYY-MM 
+        
+        if(dia >= diaCorte){
+            mesAno = `${año}-${mes + 1}`; // YYYY-MM 
+        }
 
         // Inicializar el mes en el objeto estadoCuenta
         if (!estadoCuenta[mesAno]) {
@@ -425,12 +444,15 @@ const calcularEstadoCuenta = (movimientosInput) => {
         const siguienteMes = mes === 12 ? 1 : mes + 1;
         const siguienteAno = siguienteMes === 1 ? año + 1 : año;
         const fechaCorte = new Date(`${siguienteAno}-${siguienteMes}-${diaCorte}`);
+        const fechaPago = `${tarjetaSeleccionada.pago}/${siguienteMes + 1}`;
+        fechaCorte.setUTCHours(0, 0, 0, 0); // Establece la hora a medianoche (00:00:00) en UTC
 
         const nuevaFactura = {
             fecha: `${fechaCorte.toISOString().split('T')[0]}`,
             tipo: "factura",
             monto: saldoPendienteMesAnterior, // Asignar el monto de parcial
             tarjeta: tarjetaSeleccionada.cardId, // Usar la tarjeta seleccionada
+            detalle: "Fecha Pago "+fechaPago
         };
 
         if (tarjetaSeleccionada.tipo === "credito") {
@@ -606,7 +628,7 @@ function modificarTarjeta(id) {
 document.addEventListener("DOMContentLoaded", function () {
     cargarEstado();
     
-    resetearFecha(); // Esto inicializará correctamente la fecha y actualizará el icono
+    resetearOpciones(); // Esto inicializará correctamente la fecha y actualizará el icono
     actualizarIconoFecha();
     cambiarMovimiento();
     cambiarTarjeta();

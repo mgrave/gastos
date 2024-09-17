@@ -261,7 +261,7 @@ function agregarMovimiento() {
                 concepto: conceptos[conceptoPivot].conceptId, // Concepto seleccionado
                 tarjeta: tarjetasActivas[tarjetaPivot].cardId, // Tarjeta seleccionada
                 detalle: `${detalleMov}`, // Detalle
-				cuotas: cuotas > 1 ? `${i + 1}/${cuotas}` : 1
+				cuotas: cuotas > 1 ? `${i + 1}/${cuotas}` : ""
             };
 
             movimientos.push(nuevoMovimiento); // Agregar el nuevo movimiento

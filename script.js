@@ -523,9 +523,10 @@ function eliminarMovimiento(movId) {
 
 function descargarBackup() {
     const datos = {
-        tarjetas: tarjetasActivas,
+        tarjetas: tarjetas,
         conceptos: conceptos,
         movimientos: movimientos,
+		simulaciones: simulaciones
     };
 
     const json = JSON.stringify(datos, null, 2);
@@ -538,13 +539,13 @@ function descargarBackup() {
 }
 
 // Guarda información en el localStorage
-function guardarEstado() {
-    console.log("Guardando estado...")
-    console.log("MOVIM EN DATAJSON " + JSON.stringify(dataJson, null, 2))
+function guardarEstado() {    
+    console.log("Guardando estado... " + JSON.stringify(dataJson, null, 2))
     const data = {
-        //tarjetas: tarjetas,
+        tarjetas: tarjetas,
         //conceptos: conceptos,
-        movimientos: movimientos
+        movimientos: movimientos,
+		simulaciones: simulaciones
     };
     localStorage.setItem('data', JSON.stringify(data));
 
@@ -559,9 +560,10 @@ function cargarEstado() {
     estadoGuardado = localStorage.getItem('data');
     if (estadoGuardado) {
         estado = JSON.parse(estadoGuardado);
-        //tarjetas = estado.tarjetas;
+        tarjetas = estado.tarjetas;
         //conceptos = estado.conceptos;
         movimientos = estado.movimientos;
+		simulaciones: estado.simulaciones;
         //dataJson = estado.dataJson;
         // Agrega aquí cualquier otra información que necesites restaurar
     }
@@ -587,6 +589,13 @@ document
 		 renderTarjetas(); // Renderizar las tarjetas al cargar el DOM
     });
 	
+// Agrega evento click al menú de lista
+document
+    .querySelector("#estimados-menu")
+    .addEventListener("click", function () {
+        $("#estimadosModal").modal("show");
+		 renderTarjetas(); // Renderizar las tarjetas al cargar el DOM
+    });
 	
 	
 	
@@ -668,6 +677,7 @@ document
 
       // Actualizar la interfaz después de guardar
       renderTarjetas();
+	  guardarEstado();
       alert('Tarjeta guardada correctamente');
     }
   }
@@ -710,3 +720,242 @@ document
     isNewCard = true;
     renderTarjetas();
   });
+  
+  
+  
+  //Estimados
+// Variables necesarias
+let idCounterEstimados = 1; // Contador para los ID únicos de cada simulación
+let simulaciones = []; // Array para almacenar las simulaciones
+let totalEstimado = 0;
+const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
+
+// Función para actualizar la suma total de estimados
+function actualizarTotalEstimado() {
+  totalEstimado = simulaciones.reduce((total, simulacion) => total + parseFloat(simulacion.monto), 0);
+  document.getElementById('total-estimado').textContent = totalEstimado.toFixed(2);
+}
+
+// Función para generar un nuevo acordeón de simulación
+function agregarEstimado() {
+  const estimadosLista = document.getElementById('estimados-lista');
+  const nuevoId = idCounterEstimados++;
+
+  // Crear un nuevo acordeón con los controles para la simulación
+  const acordeonHTML = `
+    <div class="card mb-3" id="estimado-${nuevoId}">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0" id="titulo-estimado-${nuevoId}">NUEVO ESTIMADO</h5>
+        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-${nuevoId}" aria-expanded="false" aria-controls="collapse-${nuevoId}">
+          <i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+      <div id="collapse-${nuevoId}" class="collapse" data-parent="#estimados-lista">
+        <div class="card-body">
+          <div class="form-group">
+            <label for="monto-estimado-${nuevoId}">Monto</label>
+            <input type="number" class="form-control" id="monto-estimado-${nuevoId}" placeholder="Ingrese el monto">
+          </div>
+          <div class="form-group">
+            <label for="detalle-estimado-${nuevoId}">Detalle</label>
+            <input type="text" class="form-control" id="detalle-estimado-${nuevoId}" placeholder="Ingrese el detalle">
+          </div>
+          <button class="btn btn-success" onclick="guardarEstimado(${nuevoId})">Guardar</button>
+          <button class="btn btn-danger" onclick="eliminarEstimado(${nuevoId})">Eliminar</button>
+          <button class="btn btn-secondary" onclick="cancelarEstimado(${nuevoId})">Cancelar</button>
+          <button class="btn btn-primary" onclick="pagarEstimado(${nuevoId})">Pagar</button>
+        </div>
+      </div>
+    </div>`;
+
+  estimadosLista.insertAdjacentHTML('beforeend', acordeonHTML);
+
+  // Desplegar el acordeón recién creado
+  $(`#collapse-${nuevoId}`).collapse('show');
+}
+
+// Función para guardar una simulación
+function guardarEstimado(id) {
+  const monto = document.getElementById(`monto-estimado-${id}`).value;
+  const detalle = document.getElementById(`detalle-estimado-${id}`).value;
+
+  if (monto && detalle) {
+    const nuevaSimulacion = {
+      movId: id,
+      monto: parseFloat(monto).toFixed(2),
+      detalle: detalle,
+      fecha: new Date().toISOString().split('T')[0], // Fecha actual
+      tipo: 'egreso', // Puede ajustarse según sea necesario
+      concepto: 4, // Por defecto, ajustable
+      tarjeta: tarjetaSeleccionada.id, // Tarjeta seleccionada
+      cuotas: "" // Puede ser ajustado
+    };
+
+    // Buscar si ya existe para actualizar
+    const index = simulaciones.findIndex(sim => sim.movId === id);
+    if (index !== -1) {
+      simulaciones[index] = nuevaSimulacion;
+    } else {
+      simulaciones.push(nuevaSimulacion);
+    }
+
+    // Actualizar el título con el detalle y monto
+    document.getElementById(`titulo-estimado-${id}`).textContent = `${detalle.toUpperCase()} - $${nuevaSimulacion.monto}`;
+
+    actualizarTotalEstimado();
+	guardarEstado();
+    // Cerrar el acordeón después de guardar
+    $(`#collapse-${id}`).collapse('hide');
+  } else {
+    alert("Por favor, ingrese todos los campos.");
+  }
+}
+
+// Función para eliminar una simulación
+function eliminarEstimado(id) {
+  // Eliminar el acordeón visualmente
+  document.getElementById(`estimado-${id}`).remove();
+
+  // Eliminar del array de simulaciones
+  simulaciones = simulaciones.filter(sim => sim.movId !== id);
+
+  actualizarTotalEstimado();
+}
+
+// Función para cancelar la creación de una simulación (solo si es nueva)
+function cancelarEstimado(id) {
+  const simulacionExiste = simulaciones.find(sim => sim.movId === id);
+
+  if (!simulacionExiste) {
+    eliminarEstimado(id); // Si es nueva, simplemente se elimina
+  } else {
+    // Si ya estaba guardada, se colapsa el acordeón
+    $(`#collapse-${id}`).collapse('hide');
+  }
+}
+
+// Función para generar un movimiento de pago para un estimado
+function pagarEstimado(id) {
+  const simulacion = simulaciones.find(sim => sim.movId === id);
+  if (simulacion) {
+    const movimientoPago = {
+      fecha: new Date().toISOString().split('T')[0],
+      tipo: 'pago',
+      monto: simulacion.monto,
+      concepto: 'Pago estimado',
+      tarjeta: tarjetaSeleccionada.id,
+      detalle: simulacion.detalle
+    };
+
+    // Aquí puedes agregar tu lógica para registrar el movimiento de pago
+    console.log(`Pago registrado para el estimado ${id}:`, movimientoPago);
+
+    alert(`Pago realizado para: ${simulacion.detalle} - $${simulacion.monto}`);
+  } else {
+    alert("Estimado no encontrado para realizar el pago.");
+  }
+}
+
+// Función para pagar todos los estimados
+function pagarTodosEstimados() {
+  simulaciones.forEach(simulacion => {
+    const movimientoPago = {
+      fecha: new Date().toISOString().split('T')[0],
+      tipo: 'pago',
+      monto: simulacion.monto,
+      concepto: 'Pago estimado',
+      tarjeta: tarjetaSeleccionada.id,
+      detalle: simulacion.detalle
+    };
+
+    // Lógica para registrar el movimiento de pago de cada estimado
+    console.log(`Pago registrado para el estimado ${simulacion.movId}:`, movimientoPago);
+  });
+
+  alert(`Se realizaron pagos por un total de $${totalEstimado.toFixed(2)}`);
+}
+
+// Inicializar el botón de agregar estimado
+document.getElementById('agregar-estimado-btn').addEventListener('click', agregarEstimado);
+
+// Inicializar el botón de pagar todos
+document.getElementById('pagar-todo-btn').addEventListener('click', pagarTodosEstimados);
+
+
+
+//Transferencia
+// Llenar el selector de tarjetas en el modal
+function llenarSelectorTransferencia() {
+  const transferenciaSelector = document.getElementById('transferencia-selector');
+  transferenciaSelector.innerHTML = ''; // Limpiar opciones anteriores
+
+  // Iterar sobre las tarjetas disponibles (suponiendo que hay un array de tarjetas en el JSON)
+  dataJson.tarjetas.forEach(tarjeta => {
+    const option = document.createElement('option');
+    option.value = tarjeta.cardId; // Usar el ID único de la tarjeta
+    option.textContent = `${tarjeta.nombre} - Saldo: $${tarjeta.balance}`;
+    transferenciaSelector.appendChild(option);
+  });
+}
+
+// Función para confirmar la transferencia
+function confirmarOpciones() {
+  const fecha = document.getElementById('fecha-selector').value;
+  const cuotas = document.getElementById('cuotas-selector').value;
+  const tarjetaTransferenciaId = document.getElementById('transferencia-selector').value;
+  
+  if (!fecha || !cuotas || !tarjetaTransferenciaId) {
+    alert("Por favor, complete todos los campos.");
+    return;
+  }
+
+	const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
+  //const tarjetaSeleccionada = obtenerTarjetaSeleccionada(); // Función que obtiene la tarjeta actual
+  const tarjetaTransferencia = dataJson.tarjetas.find(tarjeta => tarjeta.cardId == tarjetaTransferenciaId);
+
+  if (tarjetaSeleccionada && tarjetaTransferencia) {
+    // Crear movimiento de pago en la tarjeta seleccionada
+    const pagoSeleccionada = {
+      movId: generarIdUnico(),
+      fecha: fecha,
+      tipo: 'egreso',
+      monto: totalEstimado, // Sumar el monto de estimados o modificar según sea necesario
+      concepto: 'Pago a tarjeta',
+      tarjeta: tarjetaSeleccionada.cardId,
+      cuotas: cuotas
+    };
+    
+    // Crear movimiento de ingreso en la tarjeta de transferencia
+    const ingresoTransferencia = {
+      movId: generarIdUnico(),
+      fecha: fecha,
+      tipo: 'ingreso',
+      monto: totalEstimado, // Mismo monto que se paga
+      concepto: 'Transferencia recibida',
+      tarjeta: tarjetaTransferencia.cardId,
+      cuotas: cuotas
+    };
+
+    // Actualizar movimientos de las tarjetas
+    tarjetaSeleccionada.movimientos.push(pagoSeleccionada);
+    tarjetaTransferencia.movimientos.push(ingresoTransferencia);
+
+    // Actualizar saldos
+    tarjetaSeleccionada.saldo -= totalEstimado;
+    tarjetaTransferencia.saldo += totalEstimado;
+
+    // Actualizar la interfaz
+    actualizarTotalEstimado();
+    alert(`Se ha realizado la transferencia de $${totalEstimado.toFixed(2)} a la tarjeta ${tarjetaTransferencia.alias}`);
+  }
+}
+
+// Función para resetear los campos
+function resetearOpciones() {
+  document.getElementById('fecha-selector').value = '';
+  document.getElementById('cuotas-selector').value = '';
+  document.getElementById('transferencia-selector').value = '';
+}
+
+// Llamar la función para llenar el selector al abrir el modal
+$('#fechaModal').on('show.bs.modal', llenarSelectorTransferencia);

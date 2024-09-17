@@ -23,6 +23,9 @@
         <li class="nav-item" id="tarjetas-menu">
           <a class="nav-link" href="#">Tarjetas</a>
         </li>
+		<li class="nav-item" id="estimados-menu">
+          <a class="nav-link" href="#">Estimados</a>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Cargar Backup</a>
         </li>
@@ -32,9 +35,7 @@
         <li class="nav-item">
           <a class="nav-link" href="#">Cambiar Tema</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Recurrencias</a>
-        </li>
+        
         <li class="nav-item"><a class="nav-link" href="#">Operaciones</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Monedas</a></li>
       </ul>
@@ -103,12 +104,12 @@
 </div>
 
 
-<!-- Modal para seleccionar fecha y número -->
+<!-- Modal para seleccionar fecha, cuotas y transferencia -->
 <div class="modal fade" id="fechaModal" tabindex="-1" role="dialog" aria-labelledby="fechaModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="fechaModalLabel">Seleccionar Fecha y Cuotas</h5>
+        <h5 class="modal-title" id="fechaModalLabel">Seleccionar Fecha, Cuotas y Transferencia</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -123,6 +124,13 @@
         <div class="form-group">
           <label for="cuotas-selector">Seleccionar Cuotas</label>
           <input type="number" id="cuotas-selector" class="form-control" min="1" max="100" />
+        </div>
+        <!-- Desplegable de transferencia -->
+        <div class="form-group">
+          <label for="transferencia-selector">Transferencia</label>
+          <select id="transferencia-selector" class="form-control">
+            <!-- Aquí se agregarán dinámicamente las tarjetas -->
+          </select>
         </div>
       </div>
       <div class="modal-footer">
@@ -139,6 +147,7 @@
     </div>
   </div>
 </div>
+
 
 
 <!-- Modal para gestionar tarjetas -->
@@ -171,6 +180,45 @@
     </div>
   </div>
 </div>
+
+<!-- Modal para gestionar estimados -->
+<div class="modal fade" id="estimadosModal" tabindex="-1" role="dialog" aria-labelledby="estimadosModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="estimadosModalLabel">Estimados</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Botón para agregar una nueva simulación -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+		  <button type="button" class="btn btn-success" id="agregar-estimado-btn">
+			Agregar estimado
+		  </button>
+		  <!--<h5>Total Estimado: $<span id="total-estimado">0.00</span></h5>-->
+		</div>
+
+        <!-- Contenedor para el acordeón de estimados -->
+        <div id="estimados-lista">
+          <!-- Aquí se iteran las simulaciones en el acordeón -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <!-- Mostrar el total de los montos sumados -->
+        <h5 class="text-right">
+          Total: <span id="total-estimado" class="text-primary">0.00</span>
+        </h5>
+		<button type="button" class="btn btn-primary" id="pagar-todo-btn">Pagar todos los estimados</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 

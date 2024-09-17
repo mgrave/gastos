@@ -64,40 +64,44 @@ var dataJson = {
     "conceptos": [
         {
             "conceptId": 1,
+            "nombre": "Pago",
+            "tipo_movimiento": "ingreso",
+            "color": "green",
+            "activo": true
+        },
+		{
+            "conceptId": 2,
             "nombre": "Sueldo",
             "tipo_movimiento": "ingreso",
             "color": "green",
-            "por_defecto": false,
-            "activo": true
-        },
-        {
-            "conceptId": 2,
-            "nombre": "Basico",
-            "tipo_movimiento": "egreso",
-            "color": "blue",
-            "por_defecto": true,
-            "activo": true
+            "activo": true			
         },
         {
             "conceptId": 3,
-            "nombre": "Gusto",
+            "nombre": "Basico",
             "tipo_movimiento": "egreso",
-            "color": "red",
-            "por_defecto": false,
+            "color": "blue",
             "activo": true
         },
         {
             "conceptId": 4,
+            "nombre": "Gusto",
+            "tipo_movimiento": "egreso",
+            "color": "red",
+            "activo": true
+        },
+        {
+            "conceptId": 5,
             "nombre": "Ahorro",
             "tipo_movimiento": "egreso",
             "color": "gray",
-            "por_defecto": false,
             "activo": true
         }
     ]
 }
 
-let tarjetas = dataJson.tarjetas.filter((tarjeta) => tarjeta.activo);
+let tarjetas = dataJson.tarjetas;
+let tarjetasActivas = dataJson.tarjetas.filter((tarjeta) => tarjeta.activo);
 //const tarjetas = dataJson.tarjetas.map((tarjeta) => tarjeta);
 const dataConf = {
     tipoMovimiento: [
@@ -185,8 +189,8 @@ function resetearOpciones() {
 // Función para cambiar tarjeta
 function cambiarTarjeta() {
     // Get active cards by filtering tarjetas based on `activo` flag
-    tarjetaPivot = (tarjetaPivot + 1) % tarjetas.length;
-    const tarjetaSeleccionada = tarjetas[tarjetaPivot];
+    tarjetaPivot = (tarjetaPivot + 1) % tarjetasActivas.length;
+    const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
     document.getElementById("btn-tarjeta").innerText =
         tarjetaSeleccionada.nombre;
     document.getElementById("btn-tarjeta").style.backgroundColor =
@@ -241,6 +245,7 @@ function agregarMovimiento() {
     const cuotas = document.getElementById("cuotas-selector").value || 1; // Obtener el valor de cuotas, por defecto 1
     const montoPorCuota = parseFloat(monto / cuotas).toFixed(2); // Monto dividido entre cuotas (o total si es 1)
     const fechaSeleccionada = document.getElementById("fecha-selector").value || new Date().toISOString().split('T')[0]; // Si no hay fecha seleccionada, usar la fecha actual
+	const detalleMov = document.getElementById("detalleMov").value || "Pago único";
 
     if (monto && monto > 0) { // Validar que el monto sea válido
         // Iterar por cada cuota y generar un movimiento para cada una
@@ -254,8 +259,9 @@ function agregarMovimiento() {
                 tipo: tipoMovimientoActivos[movimientoPivot].tipo, // Tipo de movimiento actual
                 monto: montoPorCuota, // Monto dividido entre cuotas (o monto total si cuotas es 1)
                 concepto: conceptos[conceptoPivot].conceptId, // Concepto seleccionado
-                tarjeta: tarjetas[tarjetaPivot].cardId, // Tarjeta seleccionada
-                detalle: cuotas > 1 ? `Cuota ${i + 1}/${cuotas}` : "Pago único", // Detalle dependiendo si hay cuotas
+                tarjeta: tarjetasActivas[tarjetaPivot].cardId, // Tarjeta seleccionada
+                detalle: `${detalleMov}`, // Detalle
+				cuotas: cuotas > 1 ? `${i + 1}/${cuotas}` : 1
             };
 
             movimientos.push(nuevoMovimiento); // Agregar el nuevo movimiento
@@ -263,6 +269,7 @@ function agregarMovimiento() {
 
         actualizarMovimientos(); // Actualizar los movimientos y el balance
         document.getElementById("monto-input").value = ""; // Limpiar el input de monto
+		document.getElementById("detalleMov").value = ""; // Limpiar el input de texto
         $("#fechaModal").modal("hide"); // Cerrar el modal de selección de fecha
     } else {
         alert("Por favor, ingrese un monto válido.");
@@ -278,7 +285,7 @@ function actualizarMovimientos() {
     tbody.innerHTML = "";
     document.getElementById("sin-movimientos").style.display = "none";
 
-    const tarjetaSeleccionada = tarjetas[tarjetaPivot];
+    const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
     const movimientosFiltrados = movimientos.filter(
         (m) => m.tarjeta === tarjetaSeleccionada.cardId
     );
@@ -333,10 +340,13 @@ function actualizarMovimientos() {
             tdFecha.textContent = dia; // Mostrar solo el día de la fecha
 
             const tdConcepto = document.createElement("td");
-            tdConcepto.textContent = concepto ? concepto.nombre : tipoMovimiento.alias;
+            //tdConcepto.textContent = concepto ? concepto.nombre : tipoMovimiento.alias;
+			let concept = movimiento.detalle ? movimiento.detalle : concepto.nombre	;
+			let cuotas = movimiento.cuotas ? movimiento.cuotas : "";
+			tdConcepto.textContent = `${concept} ${cuotas}`
 
-            const tdDetalle = document.createElement("td");
-            tdDetalle.textContent = movimiento.detalle;
+            //const tdDetalle = document.createElement("td");
+            //tdDetalle.textContent = movimiento.detalle;
 
             const tdMonto = document.createElement("td");
             tdMonto.textContent = parseFloat(movimiento.monto).toFixed(2);
@@ -349,7 +359,7 @@ function actualizarMovimientos() {
 
             tr.appendChild(tdFecha);
             tr.appendChild(tdConcepto);
-            tr.appendChild(tdDetalle);
+            //tr.appendChild(tdDetalle);
             tr.appendChild(tdMonto);
 
             // Agregar botón de eliminar
@@ -380,7 +390,7 @@ const calcularEstadoCuenta = (movimientosInput) => {
     // Crear un objeto para almacenar la información de cada mes
     const estadoCuenta = {};
 
-    const tarjetaSeleccionada = tarjetas[tarjetaPivot];
+    const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
 
     const diaCorte = tarjetaSeleccionada.factura;
     const diaPago = tarjetaSeleccionada.pago;
@@ -513,7 +523,7 @@ function eliminarMovimiento(movId) {
 
 function descargarBackup() {
     const datos = {
-        tarjetas: tarjetas,
+        tarjetas: tarjetasActivas,
         conceptos: conceptos,
         movimientos: movimientos,
     };
@@ -557,76 +567,6 @@ function cargarEstado() {
     }
 }
 
-
-// Agrega evento click al menú de lista
-document
-    .querySelector("#tarjetas-menu")
-    .addEventListener("click", function () {
-        $("#tarjetasModal").modal("show");
-    });
-
-// Función para renderizar la lista de tarjetas
-function renderizarTarjetas() {
-    const tarjetasLista = document.getElementById("tarjetas-lista");
-    tarjetasLista.innerHTML = "";
-
-    // Obtén la lista de tarjetas desde tu base de datos o API
-    //const tarjetas = obtenerTarjetas();
-
-    tarjetas.forEach((tarjeta) => {
-        const desplegable = document.createElement("div");
-        desplegable.classList.add("accordion");
-
-        const titulo = document.createElement("div");
-        titulo.classList.add("accordion-title");
-        titulo.textContent = tarjeta.nombre;
-
-        const contenido = document.createElement("div");
-        contenido.classList.add("accordion-content");
-        contenido.innerHTML = `
-    <p>ID: ${tarjeta.id}</p>
-    <p>Nombre: ${tarjeta.nombre}</p>
-    <button class="btn btn-danger" onclick="eliminarTarjeta(${tarjeta.id})">Eliminar</button>
-    <button class="btn btn-primary" onclick="modificarTarjeta(${tarjeta.id})">Modificar</button>
-    `;
-
-        desplegable.appendChild(titulo);
-        desplegable.appendChild(contenido);
-
-        tarjetasLista.appendChild(desplegable);
-    });
-}
-
-// Función para agregar tarjeta
-function agregarTarjeta() {
-    const nombre = prompt("Ingrese el nombre de la tarjeta");
-    const tarjeta = { nombre };
-
-    // Agrega la tarjeta a tu base de datos o API
-    agregarTarjetaAPI(tarjeta);
-
-    renderizarTarjetas();
-}
-
-// Función para eliminar tarjeta
-function eliminarTarjeta(id) {
-    // Elimina la tarjeta de tu base de datos o API
-    eliminarTarjetaAPI(id);
-
-    renderizarTarjetas();
-}
-
-// Función para modificar tarjeta
-function modificarTarjeta(id) {
-    const nombre = prompt("Ingrese el nuevo nombre de la tarjeta");
-    const tarjeta = { id, nombre };
-
-    // Modifica la tarjeta en tu base de datos o API
-    modificarTarjetaAPI(tarjeta);
-
-    renderizarTarjetas();
-}
-
 // Agregar esto al final del script, justo antes de cerrar la etiqueta
 document.addEventListener("DOMContentLoaded", function () {
     cargarEstado();
@@ -637,3 +577,136 @@ document.addEventListener("DOMContentLoaded", function () {
     cambiarTarjeta();
 
 });
+
+
+// Agrega evento click al menú de lista
+document
+    .querySelector("#tarjetas-menu")
+    .addEventListener("click", function () {
+        $("#tarjetasModal").modal("show");
+		 renderTarjetas(); // Renderizar las tarjetas al cargar el DOM
+    });
+	
+	
+	
+	
+  let idCounterTarjetas = dataJson.tarjetas.length + 1; // Contador de ID para nuevas tarjetas
+  let lastOpenedCardId = null; // Para controlar cuál acordeón está abierto
+  let isNewCard = false; // Para identificar si una tarjeta es nueva
+
+  // Función para renderizar las tarjetas en el acordeón
+  function renderTarjetas() {
+    const tarjetasLista = document.getElementById('tarjetas-lista');
+    tarjetasLista.innerHTML = '';
+
+    dataJson.tarjetas.forEach((tarjeta, index) => {
+      const cardId = tarjeta.cardId;
+      const isExpanded = cardId === lastOpenedCardId; // Solo el acordeón abierto estará expandido
+      const nuevaTarjetaTexto = tarjeta.nueva ? ' (Nueva Tarjeta)' : '';
+      const tarjetaHtml = `
+        <div class="accordion" id="tarjetaAccordion-${cardId}">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center" id="heading-${cardId}">
+              <h5 class="mb-0 text-uppercase" style="text-decoration: none;">
+                ${tarjeta.nombre || 'NOMBRE TARJETA'} ${nuevaTarjetaTexto} (${tarjeta.tipo}) - ${tarjeta.color || 'COLOR'}
+              </h5>
+              <button class="btn btn-link p-0" type="button" data-toggle="collapse" data-target="#collapse-${cardId}" aria-expanded="${isExpanded}" aria-controls="collapse-${cardId}">
+                <i class="fas fa-chevron-down"></i>
+              </button>
+            </div>
+            <div id="collapse-${cardId}" class="collapse ${isExpanded ? 'show' : ''}" aria-labelledby="heading-${cardId}" data-parent="#tarjetas-lista">
+              <div class="card-body">
+                <form id="tarjetaForm-${cardId}">
+                  <div class="form-group">
+                    <label for="nombre-${cardId}">Nombre</label>
+                    <input type="text" class="form-control" id="nombre-${cardId}" value="${tarjeta.nombre || ''}">
+                  </div>
+                  <div class="form-group">
+                    <label for="tipo-${cardId}">Tipo</label>
+                    <input type="text" class="form-control" id="tipo-${cardId}" value="${tarjeta.tipo}">
+                  </div>
+                  <div class="form-group">
+                    <label for="color-${cardId}">Color</label>
+                    <input type="text" class="form-control" id="color-${cardId}" value="${tarjeta.color || ''}">
+                  </div>
+                  <div class="form-group">
+                    <label for="factura-${cardId}">Factura</label>
+                    <input type="number" class="form-control" id="factura-${cardId}" value="${tarjeta.factura}">
+                  </div>
+                  <div class="form-group">
+                    <label for="pago-${cardId}">Pago</label>
+                    <input type="number" class="form-control" id="pago-${cardId}" value="${tarjeta.pago}">
+                  </div>
+                  <div class="form-group">
+                    <label for="balance-${cardId}">Balance</label>
+                    <input type="number" class="form-control" id="balance-${cardId}" value="${tarjeta.balance}">
+                  </div>
+                  <button type="button" class="btn btn-primary" onclick="guardarTarjeta(${cardId})">Guardar</button>
+                  <button type="button" class="btn btn-danger" onclick="eliminarTarjeta(${cardId})">Eliminar</button>
+                  <button type="button" class="btn btn-secondary" onclick="cancelarNuevaTarjeta(${cardId})" data-dismiss="modal">Cancelar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      tarjetasLista.insertAdjacentHTML('beforeend', tarjetaHtml);
+    });
+  }
+
+  // Función para guardar la información de la tarjeta
+  function guardarTarjeta(cardId) {
+    const tarjeta = dataJson.tarjetas.find(t => t.cardId === cardId);
+    if (tarjeta) {
+      tarjeta.nombre = document.getElementById(`nombre-${cardId}`).value || 'NOMBRE TARJETA';
+      tarjeta.tipo = document.getElementById(`tipo-${cardId}`).value || 'credito';
+      tarjeta.color = document.getElementById(`color-${cardId}`).value || 'COLOR';
+      tarjeta.factura = parseInt(document.getElementById(`factura-${cardId}`).value);
+      tarjeta.pago = parseInt(document.getElementById(`pago-${cardId}`).value);
+      tarjeta.balance = parseFloat(document.getElementById(`balance-${cardId}`).value);
+      tarjeta.nueva = false; // Si es nueva, ahora es tarjeta guardada
+      isNewCard = false;
+
+      // Actualizar la interfaz después de guardar
+      renderTarjetas();
+      alert('Tarjeta guardada correctamente');
+    }
+  }
+
+  // Función para eliminar una tarjeta
+  function eliminarTarjeta(cardId) {
+    dataJson.tarjetas = dataJson.tarjetas.filter(t => t.cardId !== cardId);
+    renderTarjetas();
+    alert('Tarjeta eliminada correctamente');
+  }
+
+  // Función para cancelar la creación de una nueva tarjeta
+  function cancelarNuevaTarjeta(cardId) {
+    const tarjeta = dataJson.tarjetas.find(t => t.cardId === cardId);
+    if (tarjeta && tarjeta.nueva) {
+      // Si la tarjeta es nueva, eliminarla
+      dataJson.tarjetas = dataJson.tarjetas.filter(t => t.cardId !== cardId);
+      isNewCard = false;
+      renderTarjetas();
+    }
+  }
+
+  // Función para agregar una nueva tarjeta
+  document.getElementById('agregar-tarjeta-btn').addEventListener('click', () => {
+    const nuevaTarjeta = {
+      cardId: idCounterTarjetas++,
+      nombre: '',
+      tipo: 'credito', // Valor por defecto
+      color: '',
+      factura: 1,
+      pago: 1,
+      control: 0,
+      parcial: 0,
+      balance: 0,
+      activo: true,
+      nueva: true // Marca de que es una tarjeta nueva
+    };
+    dataJson.tarjetas.unshift(nuevaTarjeta); // Agregar la nueva tarjeta al final del array
+    lastOpenedCardId = nuevaTarjeta.cardId; // Abrir el acordeón de la nueva tarjeta
+    isNewCard = true;
+    renderTarjetas();
+  });

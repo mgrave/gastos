@@ -1,147 +1,38 @@
 var dataJson = {
   "tarjetas": [
-    {
-      "cardId": 1,
-      "nombre": "Visa",
-      "tipo": "credito",
-      "color": "black",
-      "factura": 12,
-      "pago": 10,
-      "control": 0,
-      "parcial": 0,
-      "balance": 2500,
-      "activo": true
-    },
-    {
-      "cardId": 2,
-      "nombre": "Amex",
-      "tipo": "credito",
-      "color": "red",
-      "factura": 16,
-      "pago": 30,
-      "control": 0,
-      "parcial": 0,
-      "balance": 2500,
-      "activo": true
-    },
-    {
-      "cardId": 3,
-      "nombre": "Master",
-      "tipo": "credito",
-      "color": "blue",
-      "factura": 16,
-      "pago": 30,
-      "control": 700,
-      "parcial": 500,
-      "balance": 2500,
-      "activo": true
-    },
-    {
-      "cardId": 4,
-      "nombre": "BCP",
-      "tipo": "debito",
-      "color": "red",
-      "factura": 16,
-      "pago": 10,
-      "control": 0,
-      "parcial": 0,
-      "balance": 2500,
-      "activo": true
-    },
-    {
-      "cardId": 5,
-      "nombre": "Prestamo",
-      "tipo": "debito",
-      "color": "blue",
-      "factura": 16,
-      "pago": 10,
-      "control": 0,
-      "parcial": 0,
-      "balance": 2500,
-      "activo": true
-    }
+    { "cardId": 1, "nombre": "Visa", "tipo": "credito", "color": "black", "factura": 12, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
+    { "cardId": 2, "nombre": "Amex", "tipo": "credito", "color": "red", "factura": 16, "pago": 30, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
+    { "cardId": 3, "nombre": "Master", "tipo": "credito", "color": "blue", "factura": 16, "pago": 30, "control": 700, "parcial": 500, "balance": 2500, "activo": true },
+    { "cardId": 4, "nombre": "BCP", "tipo": "debito", "color": "red", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
+    { "cardId": 5, "nombre": "Prestamo", "tipo": "debito", "color": "blue", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true }
   ],
   "conceptos": [
-    {
-      "conceptId": 1,
-      "nombre": "Pago",
-      "tipo_movimiento": "ingreso",
-      "color": "green",
-      "activo": true
-    },
-    {
-      "conceptId": 2,
-      "nombre": "Sueldo",
-      "tipo_movimiento": "ingreso",
-      "color": "green",
-      "activo": true
-    },
-    {
-      "conceptId": 3,
-      "nombre": "Basico",
-      "tipo_movimiento": "egreso",
-      "color": "blue",
-      "activo": true
-    },
-    {
-      "conceptId": 4,
-      "nombre": "Gusto",
-      "tipo_movimiento": "egreso",
-      "color": "red",
-      "activo": true
-    },
-    {
-      "conceptId": 5,
-      "nombre": "Ahorro",
-      "tipo_movimiento": "egreso",
-      "color": "gray",
-      "activo": true
-    }
+    { "conceptId": 1, "nombre": "Pago", "tipo_movimiento": "ingreso", "color": "green", "activo": true },
+    { "conceptId": 2, "nombre": "Sueldo", "tipo_movimiento": "ingreso", "color": "green", "activo": true },
+    { "conceptId": 3, "nombre": "Basico", "tipo_movimiento": "egreso", "color": "blue", "activo": true },
+    { "conceptId": 4, "nombre": "Gusto", "tipo_movimiento": "egreso", "color": "red", "activo": true },
+    { "conceptId": 5, "nombre": "Ahorro", "tipo_movimiento": "egreso", "color": "gray", "activo": true }
   ]
 }
 
-
-let tarjetasActivas = dataJson.tarjetas.filter((tarjeta) => tarjeta.activo);
-//const tarjetas = dataJson.tarjetas.map((tarjeta) => tarjeta);
+//el color es para los botones y el class para las filas
 const dataConf = {
-  tipoMovimiento: [
-    {
-      tipo: "ingreso",
-      color: "green", //usado para el boton
-      class: "ingreso", //usado para las filas
-      alias: "Ingreso",
-      activo: true,
-    },
-    {
-      tipo: "egreso",
-      color: "red",
-      class: "egreso",
-      alias: "Egreso",
-      activo: true,
-    },
-    {
-      tipo: "factura",
-      class: "factura",
-      alias: "Factura",
-      activo: false,
-    },
-    {
-      tipo: "pago",
-      class: "pago",
-      alias: "Fecha de pago",
-      activo: false,
-    },
-  ],
+  "tipoMovimiento": [
+    { "tipo": "ingreso", "color": "green", "class": "ingreso", "alias": "Ingreso", "activo": true },
+    { "tipo": "egreso", "color": "red", "class": "egreso", "alias": "Egreso", "activo": true },
+    { "tipo": "factura", "class": "factura", "alias": "Factura", "activo": false },
+    { "tipo": "pago", "class": "pago", "alias": "Fecha de pago", "activo": false }
+  ]
 };
 
-const tipoMovimientoActivos = dataConf.tipoMovimiento.filter(
+
+let tipoMovimientoActivos = dataConf.tipoMovimiento.filter(
   (tipoMov) => tipoMov.activo
 );
 
 let conceptosActivos = dataJson.conceptos.filter(
   (conceptos) => conceptos.activo
 );
-
 
 let tarjetaPivot = 4;
 let movimientoPivot = 0;
@@ -152,244 +43,11 @@ let idCounter = 1;
 let fechaSeleccionada = new Date().toISOString().split("T")[0];
 let tarjetas = dataJson.tarjetas;
 
-// Función para cambiar tarjeta
-function cambiarTarjeta() {
-  // Get active cards by filtering tarjetas based on `activo` flag
-  tarjetaPivot = (tarjetaPivot + 1) % tarjetasActivas.length;
-  const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
-  document.getElementById("btn-tarjeta").innerText =
-    tarjetaSeleccionada.nombre;
-  document.getElementById("btn-tarjeta").style.backgroundColor =
-    tarjetaSeleccionada.color;
-
-  const tipoTarjeta = document.getElementById('tipoTarjeta');
-
-  tipoTarjeta.textContent = tarjetaSeleccionada.tipo === 'credito' ? 'T. Crédito' : 'T. Débito';
-
-  actualizarMovimientos(); // Update grid and balance when changing the card
-}
-
-// Función para cambiar movimiento
-function cambiarMovimiento() {
-  movimientoPivot = (movimientoPivot + 1) % tipoMovimientoActivos.length; // Alterna entre "ingreso" y "egreso"
-  const btnMovimiento = document.getElementById("btn-movimiento");
-  btnMovimiento.innerText = tipoMovimientoActivos[movimientoPivot].alias;
-  btnMovimiento.style.backgroundColor =
-    tipoMovimientoActivos[movimientoPivot].color;
-  btnMovimiento.style.color = "white";
-  conceptos = conceptosActivos.filter(
-    (c) => c.tipo_movimiento === tipoMovimientoActivos[movimientoPivot].tipo
-  );
-
-  const btnGuardar = document.querySelector('button[onclick="agregarMovimiento()"]');
-  if (tipoMovimientoActivos[movimientoPivot].tipo === 'egreso') {
-    btnGuardar.classList.remove('btn-success');
-    btnGuardar.classList.add('btn-danger');
-  } else if (tipoMovimientoActivos[movimientoPivot].tipo === 'ingreso') {
-    btnGuardar.classList.remove('btn-danger');
-    btnGuardar.classList.add('btn-success');
-  }
-
-  cambiarConcepto();
-  resetearOpciones();
-
-}
-
-function cambiarConcepto() {
-  conceptoPivot = (conceptoPivot + 1) % conceptos.length;
-  const conceptoSeleccionado = conceptos[conceptoPivot];
-  document.getElementById("btn-concepto").innerText =
-    conceptoSeleccionado.nombre;
-  document.getElementById("btn-concepto").style.backgroundColor =
-    conceptoSeleccionado.color;
-}
-
-// Función para agregar movimiento
-function agregarMovimiento() {
-  const monto = parseFloat(document.getElementById("monto-input").value); // Convertir monto a número
-  const cuotas = parseInt(document.getElementById("cuotas-selector").value) || 1; // Obtener el valor de cuotas, por defecto 1
-  const montoPorCuota = parseFloat(monto / cuotas).toFixed(2); // Monto dividido entre cuotas (o total si es 1)
-  const fechaSeleccionada = document.getElementById("fecha-selector").value || new Date().toISOString().split('T')[0]; // Si no hay fecha seleccionada, usar la fecha actual
-  const detalleMov = document.getElementById("detalleMov").value || "Pago único";
-  const tarjetaTransferencia = document.getElementById('transferencia-selector');
-  
-  if (monto && monto > 0) { // Validar que el monto sea válido
-    const fechaCuota = new Date(fechaSeleccionada); // Crear una nueva fecha basada en la fecha seleccionada o actual
-
-    const tarjetaOrigen = `[${tarjetasActivas[tarjetaPivot].nombre}]`;
-    const tarjetaDestino = `[${tarjetasActivas[tarjetaTransferencia.value - 1].nombre}]`;    
-
-    // Iterar por cada cuota y generar un movimiento para cada una
-    for (let i = 0; i < cuotas; i++) {      
-      const fechaMovimiento = new Date(fechaCuota);
-      fechaMovimiento.setMonth(fechaCuota.getMonth() + i); // Aumentar la fecha en meses según la cuota
-      const nuevoMovimiento = {
-        movId: idCounter++, // Incrementar el identificador único
-        fecha: fechaMovimiento.toISOString().split('T')[0], // Formato de fecha en YYYY-MM-DD
-        tipo: tipoMovimientoActivos[movimientoPivot].tipo, // Tipo de movimiento actual
-        monto: parseFloat(montoPorCuota), // Monto numérico
-        concepto: conceptos[conceptoPivot].conceptId, // Concepto seleccionado
-        tarjeta: parseInt(tarjetasActivas[tarjetaPivot].cardId), // Tarjeta seleccionada como número
-        detalle: tarjetaTransferencia && tarjetaTransferencia.value !== "" ? tarjetaDestino : `${detalleMov}`, // Detalle
-        transferira: tarjetaTransferencia && tarjetaTransferencia.value !== "" ? parseInt(tarjetaTransferencia.value) : null, // Convertir valor de transferencia a número
-        transferidode: null, // Se llena luego si es una transferencia
-        cuota: cuotas > 1 ? `${i + 1}/${cuotas}` : ""
-      };
-
-      movimientos.push(nuevoMovimiento); // Agregar el nuevo movimiento
-    }
-
-    // Verificar si la transferencia fue seleccionada y es válida
-    if (tarjetaTransferencia && tarjetaTransferencia.value !== "") {
-      const transferencia = {
-        movId: idCounter++, // Incrementar el identificador único para la transferencia
-        fecha: fechaCuota.toISOString().split('T')[0], // Formato de fecha en YYYY-MM-DD
-        tipo: "ingreso", // Tipo de movimiento
-        monto: parseFloat(montoPorCuota), // Monto como número
-        concepto: conceptos[conceptoPivot].conceptId, // Concepto seleccionado
-        tarjeta: parseInt(tarjetaTransferencia.value), // Convertir valor de la tarjeta a número
-        detalle: tarjetaOrigen, // Detalle
-        transferira: null, // No se transfiere a otra tarjeta
-        transferidode: parseInt(tarjetasActivas[tarjetaPivot].cardId), // Tarjeta de origen, convertida a número
-        cuota: ""
-      };
-
-      movimientos.push(transferencia); // Agregar el movimiento de transferencia
-      //console.log("MOVIMIENTOS... " + JSON.stringify(movimientos, null, 2));
-    }
-
-    actualizarMovimientos(); // Actualizar los movimientos y el balance
-
-    // Limpiar campos después de la operación
-    document.getElementById('transferencia-selector').value = "";
-    document.getElementById("monto-input").value = ""; // Limpiar el input de monto
-    document.getElementById("detalleMov").value = ""; // Limpiar el input de texto            
-    document.getElementById("cuotas-selector").value = 1; // Limpiar el selector de cuotas
-    
-    $("#fechaModal").modal("hide"); // Cerrar el modal de selección de fecha
-    actualizarIconoFecha();
-  } else {
-    alert("Por favor, ingrese un monto válido.");
-  }
-}
-
-
-
-
-
-
-
-// Función para actualizar la tabla de movimientos
-function actualizarMovimientos() {
-  const tbody = document.getElementById("movimientos-tbody");
-  tbody.innerHTML = "";
-  document.getElementById("sin-movimientos").style.display = "none";
-
-  const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
-  const movimientosFiltrados = movimientos.filter(
-    (m) => m.tarjeta === tarjetaSeleccionada.cardId
-  );
-
-  if (movimientosFiltrados.length === 0) {
-    document.getElementById("sin-movimientos").style.display = "block";
-    document.getElementById("balance").textContent = "0.00";
-    document.getElementById("balance").className = "balance-positive";
-    tarjetaSeleccionada.balance = 0;
-    tarjetaSeleccionada.parcial = 0; // No hay movimientos para sumar
-  } else {
-    let mesActual = "";
-
-    // Ordenar movimientos por fecha
-    const movimientosOrdenados = calcularEstadoCuenta(movimientosFiltrados);
-
-    dataJson.movimientos = movimientosOrdenados;
-
-    movimientosOrdenados.forEach((movimiento) => {
-      const fecha = new Date(movimiento.fecha + "T00:00:00");
-      const dia = fecha.getDate(); // Obtener solo el día de la fecha
-      const mes = fecha.toLocaleDateString("es-ES", {
-        year: "numeric",
-        month: "long",
-      });
-
-      // Agregar separador de mes si cambia
-      if (mes !== mesActual) {
-        const trMes = document.createElement("tr");
-        const tdMes = document.createElement("td");
-        tdMes.colSpan = 5; // Ajustar colspan si es necesario
-        tdMes.className = "month-separator";
-        tdMes.textContent = mes;
-        trMes.appendChild(tdMes);
-        tbody.appendChild(trMes);
-        mesActual = mes;
-      }
-
-      // Crear la fila del movimiento
-      const tipoMovimiento = dataConf.tipoMovimiento.find(
-        (d) => d.tipo === movimiento.tipo
-      );
-
-      const concepto = conceptosActivos.find(
-        (c) => c.conceptId === movimiento.concepto
-      );
-
-      const tr = document.createElement("tr");
-      tr.className = tipoMovimiento.class;
-
-      const tdFecha = document.createElement("td");
-      tdFecha.textContent = dia; // Mostrar solo el día de la fecha
-
-      const tdConcepto = document.createElement("td");
-      //tdConcepto.textContent = concepto ? concepto.nombre : tipoMovimiento.alias;
-      let concept = movimiento.detalle ? movimiento.detalle : concepto.nombre;
-      let cuotas = movimiento.cuotas ? movimiento.cuotas : "";
-      tdConcepto.textContent = `${concept} ${cuotas}`
-
-      //const tdDetalle = document.createElement("td");
-      //tdDetalle.textContent = movimiento.detalle;
-
-      const tdMonto = document.createElement("td");
-      tdMonto.textContent = parseFloat(movimiento.monto).toFixed(2);
-      tdMonto.className =
-        movimiento.tipo === "ingreso"
-          ? "text-success"
-          : movimiento.tipo === "egreso"
-            ? "text-danger"
-            : "";
-
-      tr.appendChild(tdFecha);
-      tr.appendChild(tdConcepto);
-      //tr.appendChild(tdDetalle);
-      tr.appendChild(tdMonto);
-
-      // Agregar botón de eliminar
-
-      const tdEliminar = document.createElement("td");
-      if (concepto) {
-        tdEliminar.innerHTML = `<button class="btn btn-danger btn-sm" onclick="eliminarMovimiento(${movimiento.movId})">
-    <i class="fas fa-trash-alt"></i>
-  </button>`;
-      }
-
-
-      tr.appendChild(tdEliminar);
-
-      tbody.appendChild(tr);
-    });
-
-    // Actualizar el balance y parcial en pantalla
-    const balanceElemento = document.getElementById("balance");
-    balanceElemento.textContent = tarjetaSeleccionada.balance.toFixed(2);
-    balanceElemento.className = tarjetaSeleccionada.balance >= 0 ? "balance-positive" : "balance-negative";
-  }
-  guardarEstado();
-}
-
 
 const calcularEstadoCuenta = (movimientosInput) => {
   // Crear un objeto para almacenar la información de cada mes
   const estadoCuenta = {};
-
+  const tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
   const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
 
   const diaCorte = tarjetaSeleccionada.factura;
@@ -511,23 +169,12 @@ const calcularEstadoCuenta = (movimientosInput) => {
   );
 };
 
-// Función para eliminar un movimiento
-function eliminarMovimiento(movId) {
-  if (confirm("¿Estás seguro de que quieres eliminar este movimiento?")) {
-    // Encontrar y eliminar el movimiento correcto usando el ID
-    movimientos = movimientos.filter(
-      (movimiento) => movimiento.movId !== movId
-    );
-    actualizarMovimientos();
-  }
-}
-
 // Guarda información en el localStorage
 function guardarEstado() {
   //console.log("Guardando estado... " + JSON.stringify(tarjetas, null, 2))
   const data = {
-    tarjetas: tarjetas,
-    conceptos: conceptos,
+    tarjetas: dataJson.tarjetas,
+    conceptos: dataJson.conceptos,
     movimientos: movimientos,
     simulaciones: simulaciones
   };
@@ -536,21 +183,21 @@ function guardarEstado() {
 
 // Carga la información del localStorage
 function cargarEstado() {
-
-  estadoGuardado = localStorage.getItem('data');
+  const estadoGuardado = localStorage.getItem('data');
+  //console.log("Recuperando estado..." + JSON.stringify(estadoGuardado, null, 2));
   if (estadoGuardado) {
-    estado = JSON.parse(estadoGuardado);
-    //console.log("Recuperando estado..." + JSON.stringify(estado, null, 2));
-    dataJson.tarjetas = estado.tarjetas;
-    dataJson.conceptos = estado.conceptos;
-    movimientos = estado.movimientos;
-    simulaciones = estado.simulaciones;
-    //dataJson = estado.dataJson;
-    // Agrega aquí cualquier otra información que necesites restaurar
+    const estado = JSON.parse(estadoGuardado);	
+    // Asignar los datos recuperados de manera correcta
+    dataJson.tarjetas = estado.tarjetas || [];
+    dataJson.conceptos = estado.conceptos || [];
+    movimientos = estado.movimientos || [];
+    simulaciones = estado.simulaciones || [];
   }
 }
 
-function descargarBackup() {
+document
+  .querySelector("#descargar_backup")
+  .addEventListener("click", function () {
   console.log("Descargar backup... " + JSON.stringify(dataJson, null, 2))
   const datos = {
     tarjetas: tarjetas,
@@ -566,397 +213,16 @@ function descargarBackup() {
   a.href = url;
   a.download = "backup.json";
   a.click();
-}
-
-
-// Agrega evento click al menú de lista
-document
-  .querySelector("#tarjetas-menu")
-  .addEventListener("click", function () {
-    $("#tarjetasModal").modal("show");
-    tarjetas = dataJson.tarjetas
-    renderTarjetas(); // Renderizar las tarjetas al cargar el DOM
-  });
-
-let idCounterTarjetas = dataJson.tarjetas.length + 1; // Contador de ID para nuevas tarjetas
-let lastOpenedCardId = null; // Para controlar cuál acordeón está abierto
-let isNewCard = false; // Para identificar si una tarjeta es nueva
-
-
-
-// Función para agregar una nueva tarjeta
-document.getElementById('agregar-tarjeta-btn').addEventListener('click', () => {
-
-  const nuevaTarjeta = {
-    cardId: idCounterTarjetas++,
-    nombre: '',
-    tipo: 'credito', // Valor por defecto
-    color: '',
-    factura: 1,
-    pago: 1,
-    control: 0,
-    parcial: 0,
-    balance: 0,
-    activo: true,
-    nueva: true // Marca de que es una tarjeta nueva
-  };
-  tarjetas.unshift(nuevaTarjeta); // Agregar la nueva tarjeta al final del array
-  lastOpenedCardId = nuevaTarjeta.cardId; // Abrir el acordeón de la nueva tarjeta
-  isNewCard = true;
-  renderTarjetas();
 });
-
-// Función para guardar la información de la tarjeta
-function guardarTarjeta(cardId) {
-  const tarjeta = tarjetas.find(t => t.cardId === cardId);
-  if (tarjeta) {
-    tarjeta.nombre = document.getElementById(`nombre-${cardId}`).value || 'NOMBRE TARJETA';
-    tarjeta.tipo = document.getElementById(`tipo-${cardId}`).value || 'credito';
-    tarjeta.color = document.getElementById(`color-${cardId}`).value || 'COLOR';
-    tarjeta.factura = parseInt(document.getElementById(`factura-${cardId}`).value);
-    tarjeta.pago = parseInt(document.getElementById(`pago-${cardId}`).value);
-    tarjeta.balance = parseFloat(document.getElementById(`balance-${cardId}`).value);
-    tarjeta.nueva = false; // Si es nueva, ahora es tarjeta guardada
-    isNewCard = false;
-
-    guardarEstado();
-    // Actualizar la interfaz después de guardar
-    renderTarjetas();
-
-    //alert('Tarjeta guardada correctamente');
-  }
-}
-
-// Función para eliminar una tarjeta
-function eliminarTarjeta(cardId) {
-  tarjetas = dataJson.tarjetas.filter(t => t.cardId !== cardId);
-  guardarEstado();
-  renderTarjetas();
-
-  //alert('Tarjeta eliminada correctamente');
-}
-
-// Función para cancelar la creación de una nueva tarjeta
-function cancelarNuevaTarjeta(cardId) {
-  const tarjeta = dataJson.tarjetas.find(t => t.cardId === cardId);
-  if (tarjeta && tarjeta.nueva) {
-    // Si la tarjeta es nueva, eliminarla
-    tarjetas = tarjetas.filter(t => t.cardId !== cardId);
-    isNewCard = false;
-    renderTarjetas();
-  }
-}
-
-// Función para renderizar las tarjetas en el acordeón
-function renderTarjetas() {
-  const tarjetasLista = document.getElementById('tarjetas-lista');
-  tarjetasLista.innerHTML = '';
-
-  tarjetas.forEach((tarjeta, index) => {
-    const cardId = tarjeta.cardId;
-    const isExpanded = cardId === lastOpenedCardId; // Solo el acordeón abierto estará expandido
-    const nuevaTarjetaTexto = tarjeta.nueva ? ' (Nueva Tarjeta)' : '';
-    const tarjetaHtml = `
-        <div class="accordion" id="tarjetaAccordion-${cardId}">
-          <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center" id="heading-${cardId}">
-              <h5 class="mb-0 text-uppercase" style="text-decoration: none;">
-                ${tarjeta.nombre || 'NOMBRE TARJETA'} ${nuevaTarjetaTexto} (${tarjeta.tipo}) - ${tarjeta.color || 'COLOR'}
-              </h5>
-              <button class="btn btn-link p-0" type="button" data-toggle="collapse" data-target="#collapse-${cardId}" aria-expanded="${isExpanded}" aria-controls="collapse-${cardId}">
-                <i class="fas fa-chevron-down"></i>
-              </button>
-            </div>
-            <div id="collapse-${cardId}" class="collapse ${isExpanded ? 'show' : ''}" aria-labelledby="heading-${cardId}" data-parent="#tarjetas-lista">
-              <div class="card-body">
-                <form id="tarjetaForm-${cardId}">
-                  <div class="form-group">
-                    <label for="nombre-${cardId}">Nombre</label>
-                    <input type="text" class="form-control" id="nombre-${cardId}" value="${tarjeta.nombre || ''}">
-                  </div>
-                  <div class="form-group">
-                    <label for="tipo-${cardId}">Tipo</label>
-                    <input type="text" class="form-control" id="tipo-${cardId}" value="${tarjeta.tipo}">
-                  </div>
-                  <div class="form-group">
-                    <label for="color-${cardId}">Color</label>
-                    <input type="text" class="form-control" id="color-${cardId}" value="${tarjeta.color || ''}">
-                  </div>
-                  <div class="form-group">
-                    <label for="factura-${cardId}">Factura</label>
-                    <input type="number" class="form-control" id="factura-${cardId}" value="${tarjeta.factura}">
-                  </div>
-                  <div class="form-group">
-                    <label for="pago-${cardId}">Pago</label>
-                    <input type="number" class="form-control" id="pago-${cardId}" value="${tarjeta.pago}">
-                  </div>
-                  <div class="form-group">
-                    <label for="balance-${cardId}">Balance</label>
-                    <input type="number" class="form-control" id="balance-${cardId}" value="${tarjeta.balance}">
-                  </div>
-                  <button type="button" class="btn btn-primary" onclick="guardarTarjeta(${cardId})">Guardar</button>
-                  <button type="button" class="btn btn-danger" onclick="eliminarTarjeta(${cardId})">Eliminar</button>
-                  <button type="button" class="btn btn-secondary" onclick="cancelarNuevaTarjeta(${cardId})" data-dismiss="modal">Cancelar</button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>`;
-    tarjetasLista.insertAdjacentHTML('beforeend', tarjetaHtml);
-  });
-}
-
-
-
-// Agrega evento click al menú de lista
-document
-  .querySelector("#estimados-menu")
-  .addEventListener("click", function () {
-    $("#estimadosModal").modal("show");
-    renderTarjetas(); // Renderizar las tarjetas al cargar el DOM
-  });
-
-//Estimados
-// Variables necesarias
-let idCounterEstimados = 1; // Contador para los ID únicos de cada simulación
-let simulaciones = []; // Array para almacenar las simulaciones
-let totalEstimado = 0;
-const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
-
-// Función para actualizar la suma total de estimados
-function actualizarTotalEstimado() {
-  totalEstimado = simulaciones.reduce((total, simulacion) => total + parseFloat(simulacion.monto), 0);
-  document.getElementById('total-estimado').textContent = totalEstimado.toFixed(2);
-}
-
-// Función para generar un nuevo acordeón de simulación
-function agregarEstimado() {
-  const estimadosLista = document.getElementById('estimados-lista');
-  const nuevoId = idCounterEstimados++;
-
-  // Crear un nuevo acordeón con los controles para la simulación
-  const acordeonHTML = `
-    <div class="card mb-3" id="estimado-${nuevoId}">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0" id="titulo-estimado-${nuevoId}">NUEVO ESTIMADO</h5>
-        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-${nuevoId}" aria-expanded="false" aria-controls="collapse-${nuevoId}">
-          <i class="fas fa-chevron-down"></i>
-        </button>
-      </div>
-      <div id="collapse-${nuevoId}" class="collapse" data-parent="#estimados-lista">
-        <div class="card-body">
-          <div class="form-group">
-            <label for="monto-estimado-${nuevoId}">Monto</label>
-            <input type="number" class="form-control" id="monto-estimado-${nuevoId}" placeholder="Ingrese el monto">
-          </div>
-          <div class="form-group">
-            <label for="detalle-estimado-${nuevoId}">Detalle</label>
-            <input type="text" class="form-control" id="detalle-estimado-${nuevoId}" placeholder="Ingrese el detalle">
-          </div>
-          <button class="btn btn-success" onclick="guardarEstimado(${nuevoId})">Guardar</button>
-          <button class="btn btn-danger" onclick="eliminarEstimado(${nuevoId})">Eliminar</button>
-          <button class="btn btn-secondary" onclick="cancelarEstimado(${nuevoId})">Cancelar</button>
-          <button class="btn btn-primary" onclick="pagarEstimado(${nuevoId})">Pagar</button>
-        </div>
-      </div>
-    </div>`;
-
-  estimadosLista.insertAdjacentHTML('beforeend', acordeonHTML);
-
-  // Desplegar el acordeón recién creado
-  $(`#collapse-${nuevoId}`).collapse('show');
-}
-
-// Función para guardar una simulación
-function guardarEstimado(id) {
-  const monto = document.getElementById(`monto-estimado-${id}`).value;
-  const detalle = document.getElementById(`detalle-estimado-${id}`).value;
-
-  if (monto && detalle) {
-    const nuevaSimulacion = {
-      movId: id,
-      monto: parseFloat(monto).toFixed(2),
-      detalle: detalle,
-      fecha: new Date().toISOString().split('T')[0], // Fecha actual
-      tipo: 'egreso', // Puede ajustarse según sea necesario
-      concepto: 4, // Por defecto, ajustable
-      tarjeta: tarjetaSeleccionada.id, // Tarjeta seleccionada
-      cuota: "" // Puede ser ajustado
-    };
-
-    // Buscar si ya existe para actualizar
-    const index = simulaciones.findIndex(sim => sim.movId === id);
-    if (index !== -1) {
-      simulaciones[index] = nuevaSimulacion;
-    } else {
-      simulaciones.push(nuevaSimulacion);
-    }
-
-    // Actualizar el título con el detalle y monto
-    document.getElementById(`titulo-estimado-${id}`).textContent = `${detalle.toUpperCase()} - $${nuevaSimulacion.monto}`;
-
-    actualizarTotalEstimado();
-    guardarEstado();
-    // Cerrar el acordeón después de guardar
-    $(`#collapse-${id}`).collapse('hide');
-  } else {
-    alert("Por favor, ingrese todos los campos.");
-  }
-  guardarEstado();
-}
-
-// Función para eliminar una simulación
-function eliminarEstimado(id) {
-  // Eliminar el acordeón visualmente
-  document.getElementById(`estimado-${id}`).remove();
-
-  // Eliminar del array de simulaciones
-  simulaciones = simulaciones.filter(sim => sim.movId !== id);
-
-  actualizarTotalEstimado();
-}
-
-// Función para cancelar la creación de una simulación (solo si es nueva)
-function cancelarEstimado(id) {
-  const simulacionExiste = simulaciones.find(sim => sim.movId === id);
-
-  if (!simulacionExiste) {
-    eliminarEstimado(id); // Si es nueva, simplemente se elimina
-  } else {
-    // Si ya estaba guardada, se colapsa el acordeón
-    $(`#collapse-${id}`).collapse('hide');
-  }
-  guardarEstado();
-}
-
-// Función para generar un movimiento de pago para un estimado
-function pagarEstimado(id) {
-  const simulacion = simulaciones.find(sim => sim.movId === id);
-  if (simulacion) {
-    const movimientoPago = {
-      fecha: new Date().toISOString().split('T')[0],
-      tipo: 'pago',
-      monto: simulacion.monto,
-      concepto: 'Pago estimado',
-      tarjeta: tarjetaSeleccionada.id,
-      detalle: simulacion.detalle
-    };
-
-    // Aquí puedes agregar tu lógica para registrar el movimiento de pago
-    console.log(`Pago registrado para el estimado ${id}:`, movimientoPago);
-
-    alert(`Pago realizado para: ${simulacion.detalle} - $${simulacion.monto}`);
-  } else {
-    alert("Estimado no encontrado para realizar el pago.");
-  }
-}
-
-// Función para pagar todos los estimados
-function pagarTodosEstimados() {
-  simulaciones.forEach(simulacion => {
-    const movimientoPago = {
-      fecha: new Date().toISOString().split('T')[0],
-      tipo: 'pago',
-      monto: simulacion.monto,
-      concepto: 'Pago estimado',
-      tarjeta: tarjetaSeleccionada.id,
-      detalle: simulacion.detalle
-    };
-
-    // Lógica para registrar el movimiento de pago de cada estimado
-    console.log(`Pago registrado para el estimado ${simulacion.movId}:`, movimientoPago);
-  });
-
-  alert(`Se realizaron pagos por un total de $${totalEstimado.toFixed(2)}`);
-}
-
-// Inicializar el botón de agregar estimado
-document.getElementById('agregar-estimado-btn').addEventListener('click', agregarEstimado);
-
-// Inicializar el botón de pagar todos
-document.getElementById('pagar-todo-btn').addEventListener('click', pagarTodosEstimados);
-
-// Llamar la función para llenar el selector al abrir el modal
-$('#fechaModal').on('show.bs.modal', llenarSelectorTransferencia);
-
-
-
-//Transferencia
-// Llenar el selector de tarjetas en el modal
-function llenarSelectorTransferencia() {
-  const transferenciaSelector = document.getElementById('transferencia-selector');
-  transferenciaSelector.innerHTML = ''; // Limpiar opciones anteriores
-
-  // Agregar opción en blanco
-  const blankOption = document.createElement('option');
-  blankOption.value = '';
-  blankOption.textContent = 'Seleccione una tarjeta';
-  transferenciaSelector.appendChild(blankOption);
-
-  dataJson.tarjetas.forEach(tarjeta => {
-    // Excluir la tarjeta que coincide con tarjetaPivot
-
-    if (tarjeta.cardId !== tarjetaPivot + 1) {
-      const option = document.createElement('option');
-      option.value = tarjeta.cardId; // Usar el ID único de la tarjeta
-      option.textContent = `${tarjeta.nombre} - Saldo: $${tarjeta.balance}`;
-      transferenciaSelector.appendChild(option);
-    }
-  });
-}
-
-
-// Función para confirmar la fecha seleccionada
-function confirmarOpciones() {
-  const fechaSeleccionadaInput =
-    document.getElementById("fecha-selector").value;
-  if (fechaSeleccionadaInput) {
-    // Crear la fecha en la zona horaria local
-    const fechaLocal = new Date(fechaSeleccionadaInput + "T00:00:00");
-    fechaSeleccionada = fechaLocal.toISOString().split("T")[0];
-  } else {
-    fechaSeleccionada = new Date().toISOString().split("T")[0];
-  }
-  actualizarIconoFecha();
-  $("#fechaModal").modal("hide");
-}
-
-function resetearOpciones() {
-  const hoy = new Date();
-  const hoyString = hoy.toISOString().split("T")[0];
-  document.getElementById("fecha-selector").value = hoyString;
-  document.getElementById("cuotas-selector").value = 1;
-  document.getElementById("transferencia-selector").value = "";
-  fechaSeleccionada = hoyString;
-
-  actualizarIconoFecha();
-}
-
-function actualizarIconoFecha() {
-  const fechaActual = new Date().toISOString().split("T")[0];  
-  const cuotasSelector = document.getElementById("cuotas-selector");
-  const transferencia = document.getElementById("transferencia-selector");
-  const iconoFecha = document.getElementById("fecha-icon");
-
-  iconoFecha.style.color = ""; // Restaurar color por defecto
-
-  // Verificar si los elementos existen y si tienen un valor seleccionado
-  //const cuotasValida = cuotasSelector && cuotasSelector.value !== "";
-  //const transferenciaValida = transferencia && transferencia.value !== "";
-  if (fechaSeleccionada !== fechaActual || cuotasSelector.value !== "1" || transferencia.value !== "") {
-    iconoFecha.style.color = "red";
-  }
-}
 
 // Agregar esto al final del script, justo antes de cerrar la etiqueta
 document.addEventListener("DOMContentLoaded", function () {
   cargarEstado();
-
-  resetearOpciones(); // Esto inicializará correctamente la fecha y actualizará el icono
-  actualizarIconoFecha();
+  resetearOpciones();
   cambiarMovimiento();
   cambiarTarjeta();
-
+  guardarEstado(); // Guardar el estado después de inicializar la página
 });
+
 
 

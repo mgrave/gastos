@@ -29,8 +29,8 @@
         <li class="nav-item">
           <a class="nav-link" href="#">Cargar Backup</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#" onclick="descargarBackup()">Descargar Backup</a>
+        <li class="nav-item" id="descargar_backup">
+          <a class="nav-link" href="#" >Descargar Backup</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Cambiar Tema</a>
@@ -80,20 +80,20 @@
 <div class="footer">
   <div class="container">
     <div class="d-flex align-items-center">
-      <input type="text" id="detalleMov" class="form-control border-0 bg-transparent" placeholder="Ingresa tu detalle" style="flex: 1; max-width: none;" />
+      <input type="text" id="detalle" class="form-control border-0 bg-transparent" placeholder="Ingresa tu detalle" style="flex: 1; max-width: none;" />
       <h5 class="ml-3 mb-0">
         <span id="tipoTarjeta" class="tipo-tarjeta">Balance</span> 
         <span id="balance" class="balance-positive">0.00</span>
       </h5>
     </div>
     <div class="input-group mt-2">
-      <button class="btn btn-outline-secondary" id="fecha-btn" data-toggle="modal" data-target="#fechaModal">
-        <i id="fecha-icon" class="fas fa-calendar-alt"></i>
+      <button class="btn btn-outline-secondary" id="opciones" data-toggle="modal" data-target="#fechaModal">
+        <i id="fecha-icon" class="fas fa-tasks"></i>
       </button>
-      <button class="btn btn-outline-secondary" id="cuotas" onclick="resetearOpciones()">
+      <button class="btn btn-outline-secondary" id="reset" onclick="resetearOpciones()">
         <i class="fas fa-undo"></i>
       </button>
-      <input type="number" class="form-control" id="monto-input" placeholder="Monto del movimiento" />
+      <input type="number" class="form-control" id="monto" placeholder="Monto del movimiento" />
       <div class="input-group-append">
         <button class="btn btn-success" onclick="agregarMovimiento()">
           Guardar
@@ -226,6 +226,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>}
   <script src="./script.js"></script>
+  <script src="./opciones.js"></script>
+  <script src="./tarjetas.js"></script>
+  <script src="./movimientos.js"></script>  
+  <script src="./estimados.js"></script>
 </body>
 
 </html>

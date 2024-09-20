@@ -152,42 +152,6 @@ let idCounter = 1;
 let fechaSeleccionada = new Date().toISOString().split("T")[0];
 let tarjetas = dataJson.tarjetas;
 
-function actualizarIconoFecha() {
-  const fechaActual = new Date().toISOString().split("T")[0];
-  const iconoFecha = document.getElementById("fecha-icon");
-
-  if (fechaSeleccionada !== fechaActual) {
-    iconoFecha.style.color = "red";
-  } else {
-    iconoFecha.style.color = ""; // Restaurar color por defecto
-  }
-}
-
-// Función para confirmar la fecha seleccionada
-function confirmarOpciones() {
-  const fechaSeleccionadaInput =
-    document.getElementById("fecha-selector").value;
-  if (fechaSeleccionadaInput) {
-    // Crear la fecha en la zona horaria local
-    const fechaLocal = new Date(fechaSeleccionadaInput + "T00:00:00");
-    fechaSeleccionada = fechaLocal.toISOString().split("T")[0];
-  } else {
-    fechaSeleccionada = new Date().toISOString().split("T")[0];
-  }
-  actualizarIconoFecha();
-  $("#fechaModal").modal("hide");
-}
-
-function resetearOpciones() {
-  const hoy = new Date();
-  const hoyString = hoy.toISOString().split("T")[0];
-  document.getElementById("fecha-selector").value = hoyString;
-  fechaSeleccionada = hoyString;
-  const nroCuotas = document.getElementById("cuotas-selector");
-  nroCuotas.value = 1;
-  actualizarIconoFecha();
-}
-
 // Función para cambiar tarjeta
 function cambiarTarjeta() {
   // Get active cards by filtering tarjetas based on `activo` flag
@@ -241,42 +205,76 @@ function cambiarConcepto() {
 }
 
 // Función para agregar movimiento
-
 function agregarMovimiento() {
-  const monto = document.getElementById("monto-input").value;
-  const cuotas = document.getElementById("cuotas-selector").value || 1; // Obtener el valor de cuotas, por defecto 1
+  const monto = parseFloat(document.getElementById("monto-input").value); // Convertir monto a número
+  const cuotas = parseInt(document.getElementById("cuotas-selector").value) || 1; // Obtener el valor de cuotas, por defecto 1
   const montoPorCuota = parseFloat(monto / cuotas).toFixed(2); // Monto dividido entre cuotas (o total si es 1)
   const fechaSeleccionada = document.getElementById("fecha-selector").value || new Date().toISOString().split('T')[0]; // Si no hay fecha seleccionada, usar la fecha actual
   const detalleMov = document.getElementById("detalleMov").value || "Pago único";
-
+  const tarjetaTransferencia = document.getElementById('transferencia-selector');
+  
   if (monto && monto > 0) { // Validar que el monto sea válido
-    // Iterar por cada cuota y generar un movimiento para cada una
-    for (let i = 0; i < cuotas; i++) {
-      const fechaCuota = new Date(fechaSeleccionada); // Crear una nueva fecha basada en la fecha seleccionada o actual
-      fechaCuota.setMonth(fechaCuota.getMonth() + i); // Aumentar la fecha en meses según la cuota
+    const fechaCuota = new Date(fechaSeleccionada); // Crear una nueva fecha basada en la fecha seleccionada o actual
 
+    const tarjetaOrigen = `[${tarjetasActivas[tarjetaPivot].nombre}]`;
+    const tarjetaDestino = `[${tarjetasActivas[tarjetaTransferencia.value - 1].nombre}]`;    
+
+    // Iterar por cada cuota y generar un movimiento para cada una
+    for (let i = 0; i < cuotas; i++) {      
+      const fechaMovimiento = new Date(fechaCuota);
+      fechaMovimiento.setMonth(fechaCuota.getMonth() + i); // Aumentar la fecha en meses según la cuota
       const nuevoMovimiento = {
-        movId: idCounter++, // Identificador único
-        fecha: fechaCuota.toISOString().split('T')[0], // Formato de fecha en YYYY-MM-DD
+        movId: idCounter++, // Incrementar el identificador único
+        fecha: fechaMovimiento.toISOString().split('T')[0], // Formato de fecha en YYYY-MM-DD
         tipo: tipoMovimientoActivos[movimientoPivot].tipo, // Tipo de movimiento actual
-        monto: montoPorCuota, // Monto dividido entre cuotas (o monto total si cuotas es 1)
+        monto: parseFloat(montoPorCuota), // Monto numérico
         concepto: conceptos[conceptoPivot].conceptId, // Concepto seleccionado
-        tarjeta: tarjetasActivas[tarjetaPivot].cardId, // Tarjeta seleccionada
-        detalle: `${detalleMov}`, // Detalle
-        cuotas: cuotas > 1 ? `${i + 1}/${cuotas}` : ""
+        tarjeta: parseInt(tarjetasActivas[tarjetaPivot].cardId), // Tarjeta seleccionada como número
+        detalle: tarjetaTransferencia && tarjetaTransferencia.value !== "" ? tarjetaDestino : `${detalleMov}`, // Detalle
+        transferira: tarjetaTransferencia && tarjetaTransferencia.value !== "" ? parseInt(tarjetaTransferencia.value) : null, // Convertir valor de transferencia a número
+        transferidode: null, // Se llena luego si es una transferencia
+        cuota: cuotas > 1 ? `${i + 1}/${cuotas}` : ""
       };
 
       movimientos.push(nuevoMovimiento); // Agregar el nuevo movimiento
     }
 
+    // Verificar si la transferencia fue seleccionada y es válida
+    if (tarjetaTransferencia && tarjetaTransferencia.value !== "") {
+      const transferencia = {
+        movId: idCounter++, // Incrementar el identificador único para la transferencia
+        fecha: fechaCuota.toISOString().split('T')[0], // Formato de fecha en YYYY-MM-DD
+        tipo: "ingreso", // Tipo de movimiento
+        monto: parseFloat(montoPorCuota), // Monto como número
+        concepto: conceptos[conceptoPivot].conceptId, // Concepto seleccionado
+        tarjeta: parseInt(tarjetaTransferencia.value), // Convertir valor de la tarjeta a número
+        detalle: tarjetaOrigen, // Detalle
+        transferira: null, // No se transfiere a otra tarjeta
+        transferidode: parseInt(tarjetasActivas[tarjetaPivot].cardId), // Tarjeta de origen, convertida a número
+        cuota: ""
+      };
+
+      movimientos.push(transferencia); // Agregar el movimiento de transferencia
+      //console.log("MOVIMIENTOS... " + JSON.stringify(movimientos, null, 2));
+    }
+
     actualizarMovimientos(); // Actualizar los movimientos y el balance
+
+    // Limpiar campos después de la operación
+    document.getElementById('transferencia-selector').value = "";
     document.getElementById("monto-input").value = ""; // Limpiar el input de monto
-    document.getElementById("detalleMov").value = ""; // Limpiar el input de texto
+    document.getElementById("detalleMov").value = ""; // Limpiar el input de texto            
+    document.getElementById("cuotas-selector").value = 1; // Limpiar el selector de cuotas
+    
     $("#fechaModal").modal("hide"); // Cerrar el modal de selección de fecha
+    actualizarIconoFecha();
   } else {
     alert("Por favor, ingrese un monto válido.");
   }
 }
+
+
+
 
 
 
@@ -463,6 +461,7 @@ const calcularEstadoCuenta = (movimientosInput) => {
     fechaCorte.setUTCHours(0, 0, 0, 0); // Establece la hora a medianoche (00:00:00) en UTC
 
     const nuevaFactura = {
+      movId: idCounter++, // Incrementar el identificador único para la transferencia
       fecha: `${fechaCorte.toISOString().split('T')[0]}`,
       tipo: "factura",
       monto: saldoPendienteMesAnterior, // Asignar el monto de parcial
@@ -506,7 +505,7 @@ const calcularEstadoCuenta = (movimientosInput) => {
   // Mostrar la factura para el último mes en el estado de cuenta
   const ultimoMesAno = Object.keys(estadoCuenta).pop();
   mostrarFactura(ultimoMesAno);
-  
+
   return movimientosOutput = movimientos.sort(
     (a, b) => new Date(a.fecha) - new Date(b.fecha)
   );
@@ -523,12 +522,9 @@ function eliminarMovimiento(movId) {
   }
 }
 
-
-
-
 // Guarda información en el localStorage
 function guardarEstado() {
-  console.log("Guardando estado... " + JSON.stringify(tarjetas, null, 2))
+  //console.log("Guardando estado... " + JSON.stringify(tarjetas, null, 2))
   const data = {
     tarjetas: tarjetas,
     conceptos: conceptos,
@@ -544,9 +540,7 @@ function cargarEstado() {
   estadoGuardado = localStorage.getItem('data');
   if (estadoGuardado) {
     estado = JSON.parse(estadoGuardado);
-
-    console.log("Recuperando estado..." + JSON.stringify(estado, null, 2));
-
+    //console.log("Recuperando estado..." + JSON.stringify(estado, null, 2));
     dataJson.tarjetas = estado.tarjetas;
     dataJson.conceptos = estado.conceptos;
     movimientos = estado.movimientos;
@@ -592,7 +586,7 @@ let isNewCard = false; // Para identificar si una tarjeta es nueva
 
 // Función para agregar una nueva tarjeta
 document.getElementById('agregar-tarjeta-btn').addEventListener('click', () => {
-  console.log("idCounterTarjetas "+idCounterTarjetas)
+
   const nuevaTarjeta = {
     cardId: idCounterTarjetas++,
     nombre: '',
@@ -638,7 +632,7 @@ function eliminarTarjeta(cardId) {
   tarjetas = dataJson.tarjetas.filter(t => t.cardId !== cardId);
   guardarEstado();
   renderTarjetas();
-  
+
   //alert('Tarjeta eliminada correctamente');
 }
 
@@ -657,7 +651,7 @@ function cancelarNuevaTarjeta(cardId) {
 function renderTarjetas() {
   const tarjetasLista = document.getElementById('tarjetas-lista');
   tarjetasLista.innerHTML = '';
-  
+
   tarjetas.forEach((tarjeta, index) => {
     const cardId = tarjeta.cardId;
     const isExpanded = cardId === lastOpenedCardId; // Solo el acordeón abierto estará expandido
@@ -787,7 +781,7 @@ function guardarEstimado(id) {
       tipo: 'egreso', // Puede ajustarse según sea necesario
       concepto: 4, // Por defecto, ajustable
       tarjeta: tarjetaSeleccionada.id, // Tarjeta seleccionada
-      cuotas: "" // Puede ser ajustado
+      cuota: "" // Puede ser ajustado
     };
 
     // Buscar si ya existe para actualizar
@@ -882,6 +876,9 @@ document.getElementById('agregar-estimado-btn').addEventListener('click', agrega
 // Inicializar el botón de pagar todos
 document.getElementById('pagar-todo-btn').addEventListener('click', pagarTodosEstimados);
 
+// Llamar la función para llenar el selector al abrir el modal
+$('#fechaModal').on('show.bs.modal', llenarSelectorTransferencia);
+
 
 
 //Transferencia
@@ -890,78 +887,66 @@ function llenarSelectorTransferencia() {
   const transferenciaSelector = document.getElementById('transferencia-selector');
   transferenciaSelector.innerHTML = ''; // Limpiar opciones anteriores
 
-  // Iterar sobre las tarjetas disponibles (suponiendo que hay un array de tarjetas en el JSON)
+  // Agregar opción en blanco
+  const blankOption = document.createElement('option');
+  blankOption.value = '';
+  blankOption.textContent = 'Seleccione una tarjeta';
+  transferenciaSelector.appendChild(blankOption);
+
   dataJson.tarjetas.forEach(tarjeta => {
-    const option = document.createElement('option');
-    option.value = tarjeta.cardId; // Usar el ID único de la tarjeta
-    option.textContent = `${tarjeta.nombre} - Saldo: $${tarjeta.balance}`;
-    transferenciaSelector.appendChild(option);
+    // Excluir la tarjeta que coincide con tarjetaPivot
+
+    if (tarjeta.cardId !== tarjetaPivot + 1) {
+      const option = document.createElement('option');
+      option.value = tarjeta.cardId; // Usar el ID único de la tarjeta
+      option.textContent = `${tarjeta.nombre} - Saldo: $${tarjeta.balance}`;
+      transferenciaSelector.appendChild(option);
+    }
   });
 }
 
-// Función para confirmar la transferencia
+
+// Función para confirmar la fecha seleccionada
 function confirmarOpciones() {
-  const fecha = document.getElementById('fecha-selector').value;
-  const cuotas = document.getElementById('cuotas-selector').value;
-  const tarjetaTransferenciaId = document.getElementById('transferencia-selector').value;
-
-  if (!fecha || !cuotas || !tarjetaTransferenciaId) {
-    alert("Por favor, complete todos los campos.");
-    return;
+  const fechaSeleccionadaInput =
+    document.getElementById("fecha-selector").value;
+  if (fechaSeleccionadaInput) {
+    // Crear la fecha en la zona horaria local
+    const fechaLocal = new Date(fechaSeleccionadaInput + "T00:00:00");
+    fechaSeleccionada = fechaLocal.toISOString().split("T")[0];
+  } else {
+    fechaSeleccionada = new Date().toISOString().split("T")[0];
   }
-
-  const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
-  //const tarjetaSeleccionada = obtenerTarjetaSeleccionada(); // Función que obtiene la tarjeta actual
-  const tarjetaTransferencia = dataJson.tarjetas.find(tarjeta => tarjeta.cardId == tarjetaTransferenciaId);
-
-  if (tarjetaSeleccionada && tarjetaTransferencia) {
-    // Crear movimiento de pago en la tarjeta seleccionada
-    const pagoSeleccionada = {
-      movId: generarIdUnico(),
-      fecha: fecha,
-      tipo: 'egreso',
-      monto: totalEstimado, // Sumar el monto de estimados o modificar según sea necesario
-      concepto: 'Pago a tarjeta',
-      tarjeta: tarjetaSeleccionada.cardId,
-      cuotas: cuotas
-    };
-
-    // Crear movimiento de ingreso en la tarjeta de transferencia
-    const ingresoTransferencia = {
-      movId: generarIdUnico(),
-      fecha: fecha,
-      tipo: 'ingreso',
-      monto: totalEstimado, // Mismo monto que se paga
-      concepto: 'Transferencia recibida',
-      tarjeta: tarjetaTransferencia.cardId,
-      cuotas: cuotas
-    };
-
-    // Actualizar movimientos de las tarjetas
-    tarjetaSeleccionada.movimientos.push(pagoSeleccionada);
-    tarjetaTransferencia.movimientos.push(ingresoTransferencia);
-
-    // Actualizar saldos
-    tarjetaSeleccionada.saldo -= totalEstimado;
-    tarjetaTransferencia.saldo += totalEstimado;
-
-    // Actualizar la interfaz
-    actualizarTotalEstimado();
-    alert(`Se ha realizado la transferencia de $${totalEstimado.toFixed(2)} a la tarjeta ${tarjetaTransferencia.alias}`);
-  }
+  actualizarIconoFecha();
+  $("#fechaModal").modal("hide");
 }
 
-// Función para resetear los campos
 function resetearOpciones() {
-  document.getElementById('fecha-selector').value = '';
-  document.getElementById('cuotas-selector').value = '';
-  document.getElementById('transferencia-selector').value = '';
+  const hoy = new Date();
+  const hoyString = hoy.toISOString().split("T")[0];
+  document.getElementById("fecha-selector").value = hoyString;
+  document.getElementById("cuotas-selector").value = 1;
+  document.getElementById("transferencia-selector").value = "";
+  fechaSeleccionada = hoyString;
+
+  actualizarIconoFecha();
 }
 
-// Llamar la función para llenar el selector al abrir el modal
-$('#fechaModal').on('show.bs.modal', llenarSelectorTransferencia);
+function actualizarIconoFecha() {
+  const fechaActual = new Date().toISOString().split("T")[0];  
+  const cuotasSelector = document.getElementById("cuotas-selector");
+  const transferencia = document.getElementById("transferencia-selector");
+  const iconoFecha = document.getElementById("fecha-icon");
 
+  iconoFecha.style.color = ""; // Restaurar color por defecto
 
+  // Verificar si los elementos existen y si tienen un valor seleccionado
+  //const cuotasValida = cuotasSelector && cuotasSelector.value !== "";
+  //const transferenciaValida = transferencia && transferencia.value !== "";
+  if (fechaSeleccionada !== fechaActual || cuotasSelector.value !== "1" || transferencia.value !== "") {
+    iconoFecha.style.color = "red";
+  }
+}
 
 // Agregar esto al final del script, justo antes de cerrar la etiqueta
 document.addEventListener("DOMContentLoaded", function () {
@@ -973,3 +958,5 @@ document.addEventListener("DOMContentLoaded", function () {
   cambiarTarjeta();
 
 });
+
+

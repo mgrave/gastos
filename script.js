@@ -214,7 +214,7 @@ document
   console.log("Descargar backup... " + JSON.stringify(dataJson, null, 2))
   const datos = {
     tarjetas: dataJson.tarjetas,
-    conceptos: dataJdon.conceptos,
+    conceptos: dataJson.conceptos,
     movimientos: movimientos,
     simulaciones: simulaciones
   };
@@ -256,7 +256,7 @@ document.getElementById('backup-file-input').addEventListener('change', function
         dataJson.conceptos = data.conceptos;
         movimientos = data.movimientos;
         simulaciones = data.simulaciones;
-        
+
         console.log('Datos cargados:', JSON.stringify(data, null, 2));
 
 

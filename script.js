@@ -214,7 +214,7 @@ document
   console.log("Descargar backup... " + JSON.stringify(dataJson, null, 2))
   const datos = {
     tarjetas: dataJson.tarjetas,
-    conceptos: conceptos,
+    conceptos: dataJdon.conceptos,
     movimientos: movimientos,
     simulaciones: simulaciones
   };

@@ -1,3 +1,56 @@
+let formularioModificado = false;
+let transferenciaSeleccionada = ''; // Variable para persistir el valor de la transferencia
+
+// Llamar la función para llenar el selector al abrir el modal
+$('#opcionesModal').on('show.bs.modal', loadOpciones);
+
+
+// Marcar el formulario como modificado cuando se cambia cualquier campo
+document.getElementById("fecha-selector").addEventListener("change", function () {
+  formularioModificado = true;
+});
+document.getElementById("cuotas-selector").addEventListener("change", function () {
+  formularioModificado = true;
+  // Limpiar el selector de transferencia si se seleccionan cuotas
+  document.getElementById("transferencia-selector").value = "";
+});
+document.getElementById("transferencia-selector").addEventListener("change", function () {
+  formularioModificado = true;
+  // Restablecer el selector de cuotas a 1 si se selecciona una transferencia
+  document.getElementById("cuotas-selector").value = 1;
+});
+
+
+// Llenar el selector de tarjetas en el modal
+function loadOpciones() {
+  console.log("Llenar Selector Transferencia ejecutado");
+  const transferenciaSelector = document.getElementById('transferencia-selector');
+  transferenciaSelector.innerHTML = ''; // Limpiar opciones anteriores
+
+  // Agregar opción en blanco
+  const blankOption = document.createElement('option');
+  blankOption.value = '';
+  blankOption.textContent = 'Seleccione una tarjeta';
+  transferenciaSelector.appendChild(blankOption);
+  
+  let tarjetas = dataJson.tarjetas;
+  tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
+  let tarjetaOrigen = tarjetasActivas.find(tarjeta => tarjeta.cardId === tarjetaPivot);
+
+  tarjetasActivas.forEach(tarjeta => {
+    // Excluir la tarjeta seleccionada actualmente
+    if (tarjeta.cardId !== tarjetaOrigen.cardId) {
+      const option = document.createElement('option');
+      option.value = tarjeta.cardId; // Usar el ID único de la tarjeta
+      option.textContent = `${tarjeta.nombre} - Saldo: $${tarjeta.balance}`;
+      transferenciaSelector.appendChild(option);
+    }
+  });
+
+  // Restaurar el valor de transferencia previamente seleccionado si existe
+  transferenciaSelector.value = transferenciaSeleccionada || '';
+}
+
 // Función para cambiar movimiento
 function cambiarMovimiento() {
   movimientoPivot = (movimientoPivot + 1) % tipoMovimientoActivos.length; // Alterna entre "ingreso" y "egreso"
@@ -26,22 +79,34 @@ function cambiarMovimiento() {
 
 // Función para cambiar tarjeta
 function cambiarTarjeta() {
-  // Get active cards by filtering tarjetas based on `activo` flag
+  // Obtener la lista de tarjetas activas
   let tarjetas = dataJson.tarjetas;
   tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
-  tarjetaPivot = (tarjetaPivot + 1) % tarjetasActivas.length;
-  const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
-  document.getElementById("btn-tarjeta").innerText =
-    tarjetaSeleccionada.nombre;
-  document.getElementById("btn-tarjeta").style.backgroundColor =
-    tarjetaSeleccionada.color;
 
+  // Encontrar el índice de la tarjeta activa actual
+  const indexActual = tarjetasActivas.findIndex(tarjeta => tarjeta.cardId === tarjetaPivot);
+  
+  // Calcular el índice de la siguiente tarjeta
+  const siguienteIndice = (indexActual + 1) % tarjetasActivas.length;
+
+  // Obtener la siguiente tarjeta activa
+  const tarjetaSeleccionada = tarjetasActivas[siguienteIndice];
+
+  // Actualizar el cardId de la tarjeta actual
+  tarjetaPivot = tarjetaSeleccionada.cardId;
+
+  // Actualizar el texto del botón y el color de fondo
+  document.getElementById("btn-tarjeta").innerText = tarjetaSeleccionada.nombre;
+  document.getElementById("btn-tarjeta").style.backgroundColor = tarjetaSeleccionada.color;
+
+  // Actualizar el tipo de tarjeta
   const tipoTarjeta = document.getElementById('tipoTarjeta');
-
   tipoTarjeta.textContent = tarjetaSeleccionada.tipo === 'credito' ? 'T. Crédito' : 'T. Débito';
 
-  actualizarMovimientos(); // Update grid and balance when changing the card
+  // Actualizar movimientos
+  actualizarMovimientos();
 }
+
 
 function cambiarConcepto() {
   conceptoPivot = (conceptoPivot + 1) % conceptos.length;
@@ -53,50 +118,25 @@ function cambiarConcepto() {
 }
 
 
-
-//Transferencia
-// Llenar el selector de tarjetas en el modal
-function llenarSelectorTransferencia() {
-  const transferenciaSelector = document.getElementById('transferencia-selector');
-  transferenciaSelector.innerHTML = ''; // Limpiar opciones anteriores
-
-  // Agregar opción en blanco
-  const blankOption = document.createElement('option');
-  blankOption.value = '';
-  blankOption.textContent = 'Seleccione una tarjeta';
-  transferenciaSelector.appendChild(blankOption);
-  
-  let tarjetas = dataJson.tarjetas;
-  tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
-
-  tarjetasActivas.forEach(tarjeta => {
-    // Excluir la tarjeta que coincide con tarjetaPivot
-
-    if (tarjeta.cardId !== tarjetaPivot + 1) {
-      const option = document.createElement('option');
-      option.value = tarjeta.cardId; // Usar el ID único de la tarjeta
-      option.textContent = `${tarjeta.nombre} - Saldo: $${tarjeta.balance}`;
-      transferenciaSelector.appendChild(option);
-    }
-  });
-}
-
-
 // Función para confirmar la fecha seleccionada
 function confirmarOpciones() {
-  const fechaSeleccionadaInput =
-    document.getElementById("fecha-selector").value;
+  const fechaSeleccionadaInput = document.getElementById("fecha-selector").value;
   if (fechaSeleccionadaInput) {
-    // Crear la fecha en la zona horaria local
     const fechaLocal = new Date(fechaSeleccionadaInput + "T00:00:00");
     fechaSeleccionada = fechaLocal.toISOString().split("T")[0];
   } else {
     fechaSeleccionada = new Date().toISOString().split("T")[0];
   }
+  
+  // Guardar la transferencia seleccionada
+  transferenciaSeleccionada = document.getElementById('transferencia-selector').value;
+
   actualizarOpciones();
-  $("#fechaModal").modal("hide");
+  $("#opcionesModal").modal("hide");
+  formularioModificado = false;
 }
 
+// Resetear valores del formulario
 function resetearOpciones() {
   const hoy = new Date();
   const hoyString = hoy.toISOString().split("T")[0];
@@ -104,10 +144,13 @@ function resetearOpciones() {
   document.getElementById("cuotas-selector").value = 1;
   document.getElementById("transferencia-selector").value = "";
   fechaSeleccionada = hoyString;
+  transferenciaSeleccionada = ''; // Resetear la transferencia seleccionada
 
   actualizarOpciones();
+  formularioModificado = false;
 }
 
+// Actualizar el estado del formulario
 function actualizarOpciones() {
   const fechaActual = new Date().toISOString().split("T")[0];  
   const cuotasSelector = document.getElementById("cuotas-selector");
@@ -116,10 +159,20 @@ function actualizarOpciones() {
 
   iconoFecha.style.color = ""; // Restaurar color por defecto
 
-  // Verificar si los elementos existen y si tienen un valor seleccionado
-  //const cuotasValida = cuotasSelector && cuotasSelector.value !== "";
-  //const transferenciaValida = transferencia && transferencia.value !== "";
   if (fechaSeleccionada !== fechaActual || cuotasSelector.value !== "1" || transferencia.value !== "") {
     iconoFecha.style.color = "red";
+    formularioModificado = true;
   }
 }
+
+// Detectar cambio en el selector de cuotas y transferencia
+document.getElementById("cuotas-selector").addEventListener("change", function() {
+  document.getElementById("transferencia-selector").value = "";
+  transferenciaSeleccionada = ''; // Vaciar transferencia al seleccionar cuotas
+  actualizarOpciones();
+});
+
+document.getElementById("transferencia-selector").addEventListener("change", function() {
+  document.getElementById("cuotas-selector").value = 1;
+  actualizarOpciones();
+});

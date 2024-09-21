@@ -3,6 +3,8 @@
 
 // Función para agregar movimiento
 function agregarMovimiento() {
+
+  let tarjetas = dataJson.tarjetas;
   const monto = parseFloat(document.getElementById("monto").value); // Convertir monto a número
   const cuotas = parseInt(document.getElementById("cuotas-selector").value) || 1; // Obtener el valor de cuotas, por defecto 1
   const montoPorCuota = parseFloat(monto / cuotas).toFixed(2); // Monto dividido entre cuotas (o total si es 1)
@@ -13,16 +15,10 @@ function agregarMovimiento() {
   if (monto && monto > 0) { // Validar que el monto sea válido
     const fechaCuota = new Date(fechaSeleccionada); // Crear una nueva fecha basada en la fecha seleccionada o actual
 
-const tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
+const tarjetasActivas = tarjetas.filter(tarjeta0 => tarjeta0.activo);
 
-const tarjetaOrigen = tarjetasActivas[tarjetaPivot] && tarjetasActivas[tarjetaPivot].nombre
-    ? `[${tarjetasActivas[tarjetaPivot].nombre}]`
-    : "[Sin tarjeta origen]";
-
-const tarjetaDestino = tarjetasActivas[tarjetaTransferencia.value - 1] && tarjetasActivas[tarjetaTransferencia.value - 1].nombre
-    ? `[${tarjetasActivas[tarjetaTransferencia.value - 1].nombre}]`
-    : "[Sin tarjeta destino]";
-
+const tarjetaOrigen = tarjetasActivas.find(tarjeta1 => tarjeta1.cardId === parseInt(tarjetaPivot));
+const tarjetaDestino = tarjetasActivas.find(tarjeta2 => tarjeta2.cardId === parseInt(tarjetaTransferencia.value));
 
     // Iterar por cada cuota y generar un movimiento para cada una
     for (let i = 0; i < cuotas; i++) {      
@@ -34,8 +30,8 @@ const tarjetaDestino = tarjetasActivas[tarjetaTransferencia.value - 1] && tarjet
         tipo: tipoMovimientoActivos[movimientoPivot].tipo, // Tipo de movimiento actual
         monto: parseFloat(montoPorCuota), // Monto numérico
         concepto: conceptos[conceptoPivot].conceptId, // Concepto seleccionado
-        tarjeta: parseInt(tarjetasActivas[tarjetaPivot].cardId), // Tarjeta seleccionada como número
-        detalle: tarjetaTransferencia && tarjetaTransferencia.value !== "" ? tarjetaDestino : detalleMov, // Detalle
+        tarjeta: parseInt(tarjetaOrigen.cardId), // Tarjeta seleccionada como número
+        detalle: tarjetaTransferencia && tarjetaTransferencia.value !== "" ? `[${tarjetaDestino.nombre}]` : detalleMov, // Detalle
         transferira: tarjetaTransferencia && tarjetaTransferencia.value !== "" ? parseInt(tarjetaTransferencia.value) : null, // Convertir valor de transferencia a número
         transferidode: null, // Se llena luego si es una transferencia
         cuota: cuotas > 1 ? `${i + 1}/${cuotas}` : ""
@@ -53,9 +49,9 @@ const tarjetaDestino = tarjetasActivas[tarjetaTransferencia.value - 1] && tarjet
         monto: parseFloat(montoPorCuota), // Monto como número
         concepto: conceptos[conceptoPivot].conceptId, // Concepto seleccionado
         tarjeta: parseInt(tarjetaTransferencia.value), // Convertir valor de la tarjeta a número
-        detalle: tarjetaOrigen, // Detalle
+        detalle: `[${tarjetaOrigen.nombre}]`, // Detalle
         transferira: null, // No se transfiere a otra tarjeta
-        transferidode: parseInt(tarjetasActivas[tarjetaPivot].cardId), // Tarjeta de origen, convertida a número
+        transferidode: parseInt(tarjetaOrigen.cardId), // Tarjeta de origen, convertida a número
         cuota: ""
       };
 
@@ -71,7 +67,7 @@ const tarjetaDestino = tarjetasActivas[tarjetaTransferencia.value - 1] && tarjet
 	document.getElementById('transferencia-selector').value = "";
     document.getElementById("cuotas-selector").value = 1; // Limpiar el selector de cuotas
 	    
-    $("#fechaModal").modal("hide"); // Cerrar el modal de selección de fecha
+    $("#opcionesModal").modal("hide"); // Cerrar el modal de selección de fecha
     actualizarOpciones();
   } else {
     alert("Por favor, ingrese un monto válido.");
@@ -84,7 +80,8 @@ function actualizarMovimientos() {
   tbody.innerHTML = "";
   document.getElementById("sin-movimientos").style.display = "none";
 
-  const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
+  //const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
+  const tarjetaSeleccionada = tarjetasActivas.find(tarjeta => tarjeta.cardId === tarjetaPivot);
   const movimientosFiltrados = movimientos.filter(
     (m) => m.tarjeta === tarjetaSeleccionada.cardId
   );
@@ -101,7 +98,7 @@ function actualizarMovimientos() {
     // Ordenar movimientos por fecha
     const movimientosOrdenados = calcularEstadoCuenta(movimientosFiltrados);
 
-    dataJson.movimientos = movimientosOrdenados;
+    //dataJson.movimientos = movimientosOrdenados;
 
     movimientosOrdenados.forEach((movimiento) => {
       const fecha = new Date(movimiento.fecha + "T00:00:00");

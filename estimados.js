@@ -164,6 +164,5 @@ document.getElementById('agregar-estimado-btn').addEventListener('click', agrega
 // Inicializar el botón de pagar todos
 document.getElementById('pagar-todo-btn').addEventListener('click', pagarTodosEstimados);
 
-// Llamar la función para llenar el selector al abrir el modal
-$('#fechaModal').on('show.bs.modal', llenarSelectorTransferencia);
+
 

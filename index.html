@@ -23,12 +23,13 @@
         <li class="nav-item" id="tarjetas-menu">
           <a class="nav-link" href="#">Tarjetas</a>
         </li>
-		<li class="nav-item" id="estimados-menu">
+		    <li class="nav-item" id="estimados-menu">
           <a class="nav-link" href="#">Estimados</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Cargar Backup</a>
-        </li>
+        <li class="nav-item" id="cargar_backup">
+          <a class="nav-link" href="#"  >Cargar Backup</a>
+          <input type="file" id="backup-file-input" style="display: none;" />
+        </li>        
         <li class="nav-item" id="descargar_backup">
           <a class="nav-link" href="#" >Descargar Backup</a>
         </li>
@@ -87,7 +88,7 @@
       </h5>
     </div>
     <div class="input-group mt-2">
-      <button class="btn btn-outline-secondary" id="opciones" data-toggle="modal" data-target="#fechaModal">
+      <button class="btn btn-outline-secondary" id="opciones" data-toggle="modal" data-target="#opcionesModal">
         <i id="fecha-icon" class="fas fa-tasks"></i>
       </button>
       <button class="btn btn-outline-secondary" id="reset" onclick="resetearOpciones()">
@@ -105,11 +106,11 @@
 
 
 <!-- Modal para seleccionar fecha, cuotas y transferencia -->
-<div class="modal fade" id="fechaModal" tabindex="-1" role="dialog" aria-labelledby="fechaModalLabel" aria-hidden="true">
+<div class="modal fade" id="opcionesModal" tabindex="-1" role="dialog" aria-labelledby="opcionesModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="fechaModalLabel">Seleccionar Fecha, Cuotas y Transferencia</h5>
+        <h5 class="modal-title" id="opcionesModalLabel">Seleccionar Fecha, Cuotas y Transferencia</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -141,7 +142,7 @@
           Seleccionar
         </button>
         <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Cancelar
+          Cerrar
         </button>
       </div>
     </div>

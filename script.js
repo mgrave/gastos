@@ -34,21 +34,34 @@ let conceptosActivos = dataJson.conceptos.filter(
   (conceptos) => conceptos.activo
 );
 
-let tarjetaPivot = 4;
+let tarjetaPivot = 0;
 let movimientoPivot = 0;
 let conceptoPivot = 0;
 let movimientos = [];
 let conceptos = [];
 let idCounter = 1;
 let fechaSeleccionada = new Date().toISOString().split("T")[0];
-let tarjetas = dataJson.tarjetas;
+
+
+document.querySelectorAll('.navbar-nav .nav-item').forEach(function (item) {
+  item.addEventListener('click', function () {
+    // Ocultar el menú al hacer clic en un ítem
+    const navbarCollapse = document.getElementById('navbarOptions');
+    if (navbarCollapse.classList.contains('show')) {
+      navbarCollapse.classList.remove('show');
+    }
+  });
+});
 
 
 const calcularEstadoCuenta = (movimientosInput) => {
   // Crear un objeto para almacenar la información de cada mes
   const estadoCuenta = {};
+  const tarjetas = dataJson.tarjetas;
   const tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
-  const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
+  //const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
+  const tarjetaSeleccionada = tarjetasActivas.find(tarjeta => tarjeta.cardId === tarjetaPivot);
+  
 
   const diaCorte = tarjetaSeleccionada.factura;
   const diaPago = tarjetaSeleccionada.pago;
@@ -118,43 +131,43 @@ const calcularEstadoCuenta = (movimientosInput) => {
     const fechaPago = `${tarjetaSeleccionada.pago}/${siguienteMes + 1}`;
     fechaCorte.setUTCHours(0, 0, 0, 0); // Establece la hora a medianoche (00:00:00) en UTC
 
-    const nuevaFactura = {
-      movId: idCounter++, // Incrementar el identificador único para la transferencia
-      fecha: `${fechaCorte.toISOString().split('T')[0]}`,
-      tipo: "factura",
-      monto: saldoPendienteMesAnterior, // Asignar el monto de parcial
-      tarjeta: tarjetaSeleccionada.cardId, // Usar la tarjeta seleccionada
-      detalle: "Vence " + fechaPago
-    };
-
     if (tarjetaSeleccionada.tipo === "credito") {
+      const nuevaFactura = {
+        movId: idCounter++, // Incrementar el identificador único para la transferencia
+        fecha: `${fechaCorte.toISOString().split('T')[0]}`,
+        tipo: "factura",
+        monto: saldoPendienteMesAnterior, // Asignar el monto de parcial
+        tarjeta: tarjetaSeleccionada.cardId, // Usar la tarjeta seleccionada
+        detalle: "Vence " + fechaPago
+      };
+
       movimientos.push(nuevaFactura); // Agregar la nueva factura al array de nuevas facturas    
     }
-
 
   });
 
   // Mostrar la información de la factura del siguiente mes y el monto a pagar
   const mostrarFactura = (mesAno) => {
-    const [año, mes] = mesAno.split('-').map(Number);
-    const siguienteMes = mes === 12 ? 1 : mes + 1;
-    const siguienteAno = siguienteMes === 1 ? año + 1 : año;
-
-    const fechaCorte = new Date(`${siguienteAno}-${siguienteMes}-${diaCorte}`);
-    const fechaPago = new Date(`${siguienteAno}-${siguienteMes}-${diaPago}`);
-
-    console.log(`\nFactura del siguiente mes (${siguienteAno}-${siguienteMes}):`);
-    console.log(`  Fecha de corte: ${fechaCorte.toISOString().split('T')[0]}`);
-    console.log(`  Fecha de pago: ${fechaPago.toISOString().split('T')[0]}`);
-
+    if (tarjetaSeleccionada.tipo === "credito") {
+      const [año, mes] = mesAno.split('-').map(Number);
+      const siguienteMes = mes === 12 ? 1 : mes + 1;
+      const siguienteAno = siguienteMes === 1 ? año + 1 : año;
+  
+      const fechaCorte = new Date(`${siguienteAno}-${siguienteMes}-${diaCorte}`);
+      const fechaPago = new Date(`${siguienteAno}-${siguienteMes}-${diaPago}`);
+  
+      console.log(`\nFactura del siguiente mes (${siguienteAno}-${siguienteMes}):`);
+      console.log(`  Fecha de corte: ${fechaCorte.toISOString().split('T')[0]}`);
+      console.log(`  Fecha de pago: ${fechaPago.toISOString().split('T')[0]}`);
+      console.log(`  Saldo pendiente acumulado: ${saldoPendienteMesAnterior}`);
+    }
+    
     // Calcular el monto total a pagar (gastos - abonos + saldo pendiente)
     const totalGastos = Object.values(estadoCuenta).reduce((acc, curr) => acc + curr.gastos, 0);
     const totalAbonos = Object.values(estadoCuenta).reduce((acc, curr) => acc + curr.abonos, 0);
     const balance = totalAbonos - totalGastos; //+ saldoPendienteMesAnterior;
 
-    console.log(`  Saldo pendiente acumulado: ${saldoPendienteMesAnterior}`);
     console.log(`  Monto a pagar: ${balance}`);
-
 
     tarjetaSeleccionada.balance = balance;
 
@@ -200,7 +213,7 @@ document
   .addEventListener("click", function () {
   console.log("Descargar backup... " + JSON.stringify(dataJson, null, 2))
   const datos = {
-    tarjetas: tarjetas,
+    tarjetas: dataJson.tarjetas,
     conceptos: conceptos,
     movimientos: movimientos,
     simulaciones: simulaciones
@@ -214,6 +227,50 @@ document
   a.download = "backup.json";
   a.click();
 });
+
+
+
+document
+  .querySelector("#cargar_backup")
+  .addEventListener("click", function () {
+  // Obtén el elemento input de archivo
+  const backupFileInput = document.getElementById('backup-file-input');
+
+  // Simula el clic en el input de archivo
+  backupFileInput.click();
+});
+
+// Manejar el cambio en el input de archivo
+document.getElementById('backup-file-input').addEventListener('change', function () {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+      const fileContent = event.target.result;
+
+      // Si el archivo es un JSON, puedes parsearlo y utilizar los datos
+      try {
+        const data = JSON.parse(fileContent);
+        dataJson.tarjetas = data.tarjetas;
+        dataJson.conceptos = data.conceptos;
+        movimientos = data.movimientos;
+        simulaciones = data.simulaciones;
+        
+        console.log('Datos cargados:', JSON.stringify(data, null, 2));
+
+
+        // Aquí puedes integrar los datos cargados a tu aplicación
+        // Por ejemplo: actualizar el estado de la aplicación con los datos cargados
+      } catch (e) {
+        console.error('Error al analizar el archivo JSON:', e);
+      }
+    };
+
+    reader.readAsText(file);
+  }
+});
+
 
 // Agregar esto al final del script, justo antes de cerrar la etiqueta
 document.addEventListener("DOMContentLoaded", function () {

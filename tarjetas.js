@@ -165,7 +165,7 @@ function renderTarjetas() {
           <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center" id="heading-${cardId}">
               <h5 class="mb-0 text-uppercase" style="cursor: pointer; text-decoration: none;" onclick="toggleAccordion(${cardId})">
-                <i class="${iconoTipoTarjeta}"></i> ${tarjeta.nombre || 'NOMBRE TARJETA'} ${nuevaTarjetaTexto} - Balance: ${tarjeta.balance}
+                <i class="${iconoTipoTarjeta}"></i> ${tarjeta.nombre || 'NOMBRE TARJETA'} ${nuevaTarjetaTexto} - ${tarjeta.balance}
               </h5>
               <button class="btn btn-link p-0" type="button" data-toggle="collapse" data-target="#collapse-${cardId}" aria-expanded="${isExpanded}" aria-controls="collapse-${cardId}">
                 <i class="fas fa-chevron-down"></i>

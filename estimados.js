@@ -21,7 +21,7 @@ function agregarEstimado() {
     <div class="card mb-3" id="estimado-${nuevoId}">
       <div class="card-header d-flex justify-content-between align-items-center">
         <h5 class="mb-0" id="titulo-estimado-${nuevoId}">NUEVO ESTIMADO</h5>
-        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse-${nuevoId}" aria-expanded="false" aria-controls="collapse-${nuevoId}">
+        <button class="btn btn-link" data-bs-toggle="collapse" data-target="#collapse-${nuevoId}" aria-expanded="false" aria-controls="collapse-${nuevoId}">
           <i class="fas fa-chevron-down"></i>
         </button>
       </div>

@@ -4,39 +4,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestor de Gastos</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <title>many</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">	
   <link rel="stylesheet" href="./styles.css" />  
 </head>
 
 <body class="bg-light">
   <!-- Barra de título con hamburguesa -->
   <nav class="navbar navbar-dark bg-dark">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarOptions"
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOptions"
       aria-controls="navbarOptions" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <span class="navbar-brand mb-0 h1">Gestor de Gastos</span>
+    <span class="navbar-brand mb-0 h1">many</span>
     <div class="collapse navbar-collapse" id="navbarOptions">
       <ul class="navbar-nav">
         <li class="nav-item" id="tarjetas-menu">
           <a class="nav-link" href="#">Tarjetas</a>
         </li>
-		    <li class="nav-item" id="estimados-menu">
+        <li class="nav-item" id="estimados-menu">
           <a class="nav-link" href="#">Estimados</a>
         </li>
         <li class="nav-item" id="cargar_backup">
-          <a class="nav-link" href="#"  >Cargar Backup</a>
+          <a class="nav-link" href="#">Cargar Backup</a>
           <input type="file" id="backup-file-input" style="display: none;" />
         </li>        
         <li class="nav-item" id="descargar_backup">
-          <a class="nav-link" href="#" >Descargar Backup</a>
+          <a class="nav-link" href="#">Descargar Backup</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Cambiar Tema</a>
         </li>
-        
         <li class="nav-item"><a class="nav-link" href="#">Operaciones</a></li>
         <li class="nav-item"><a class="nav-link" href="#">Monedas</a></li>
       </ul>
@@ -58,7 +58,6 @@
     </div>
   </div>
   
-
   <!-- Tabla de Movimientos -->
   <div class="container mt-4">
     <div class="table-container">
@@ -72,160 +71,140 @@
       </p>
     </div>
   </div>
-  
-  
-  
- 
 
-<!-- Pie de página -->
-<div class="footer">
-  <div class="container">
-    <div class="d-flex align-items-center">
-      <input type="text" id="detalle" class="form-control border-0 bg-transparent" placeholder="Ingresa tu detalle" style="flex: 1; max-width: none;" />
-      <h5 class="ml-3 mb-0">
-        <span id="tipoTarjeta" class="tipo-tarjeta">Balance</span> 
-        <span id="balance" class="balance-positive">0.00</span>
-      </h5>
-    </div>
-    <div class="input-group mt-2">
-      <button class="btn btn-outline-secondary" id="opciones" data-toggle="modal" data-target="#opcionesModal">
-        <i id="fecha-icon" class="fas fa-tasks"></i>
-      </button>
-      <button class="btn btn-outline-secondary" id="reset" onclick="resetearOpciones()">
-        <i class="fas fa-undo"></i>
-      </button>
-      <input type="number" class="form-control" id="monto" placeholder="Monto del movimiento" />
-      <div class="input-group-append">
-        <button class="btn btn-success" onclick="agregarMovimiento()">
-          Guardar
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- Modal para seleccionar fecha, cuotas y transferencia -->
-<div class="modal fade" id="opcionesModal" tabindex="-1" role="dialog" aria-labelledby="opcionesModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="opcionesModalLabel">Seleccionar Fecha, Cuotas y Transferencia</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- Selector de fecha -->
-        <div class="form-group">
-          <label for="fecha-selector">Seleccionar Fecha</label>
-          <input type="date" id="fecha-selector" class="form-control" />
-        </div>
-        <!-- Selector numérico -->
-        <div class="form-group">
-          <label for="cuotas-selector">Seleccionar Cuotas</label>
-          <input type="number" id="cuotas-selector" class="form-control" min="1" max="100" />
-        </div>
-        <!-- Desplegable de transferencia -->
-        <div class="form-group">
-          <label for="transferencia-selector">Transferencia</label>
-          <select id="transferencia-selector" class="form-control">
-            <!-- Aquí se agregarán dinámicamente las tarjetas -->
-          </select>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-outline-secondary" onclick="resetearOpciones()" data-dismiss="modal">
-          Restaurar
-        </button>
-        <button type="button" class="btn btn-primary" onclick="confirmarOpciones()">
-          Seleccionar
-        </button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Cerrar
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<!-- Modal para gestionar tarjetas -->
-<div class="modal fade" id="tarjetasModal" tabindex="-1" role="dialog" aria-labelledby="tarjetasModalLabel"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="tarjetasModalLabel">Tarjetas</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- Botón para agregar una nueva tarjeta -->
-        <button type="button" class="btn btn-success mb-3" id="agregar-tarjeta-btn">
-          Agregar tarjeta
-        </button>
-
-        <!-- Contenedor para el acordeón de tarjetas -->
-        <div id="tarjetas-lista">
-          <!-- Aquí se iteran las tarjetas en el acordeón -->
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Cerrar
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para gestionar estimados -->
-<div class="modal fade" id="estimadosModal" tabindex="-1" role="dialog" aria-labelledby="estimadosModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="estimadosModalLabel">Estimados</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- Botón para agregar una nueva simulación -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-		  <button type="button" class="btn btn-success" id="agregar-estimado-btn">
-			Agregar estimado
-		  </button>
-		  <!--<h5>Total Estimado: $<span id="total-estimado">0.00</span></h5>-->
-		</div>
-
-        <!-- Contenedor para el acordeón de estimados -->
-        <div id="estimados-lista">
-          <!-- Aquí se iteran las simulaciones en el acordeón -->
-        </div>
-      </div>
-      <div class="modal-footer">
-        <!-- Mostrar el total de los montos sumados -->
-        <h5 class="text-right">
-          Total: <span id="total-estimado" class="text-primary">0.00</span>
+  <!-- Pie de página -->
+  <div class="footer">
+    <div class="container">
+      <div class="d-flex align-items-center">
+        <input type="text" id="detalle" class="form-control border-0 bg-transparent" placeholder="Ingresa tu detalle" style="flex: 1; max-width: none;" />
+        <h5 class="ml-3 mb-0">
+          <span id="tipoTarjeta" class="tipo-tarjeta">Balance</span> 
+          <span id="balance" class="balance-positive">0.00</span>
         </h5>
-		<button type="button" class="btn btn-primary" id="pagar-todo-btn">Pagar todos los estimados</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-          Cerrar
+      </div>
+      <div class="input-group mt-2">
+        <button class="btn btn-outline-secondary" id="opciones" data-bs-toggle="modal" data-bs-target="#opcionesModal">
+          <i id="fecha-icon" class="fas fa-tasks"></i>
         </button>
+        <button class="btn btn-outline-secondary" id="reset" onclick="resetearOpciones()">
+          <i class="fas fa-undo"></i>
+        </button>
+        <input type="number" class="form-control" id="monto" placeholder="Monto del movimiento" />
+        <div class="input-group-append">
+          <button class="btn btn-success" onclick="agregarMovimiento()">
+            Guardar
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- Modal para seleccionar fecha, cuotas y transferencia -->
+  <div class="modal fade" id="opcionesModal" tabindex="-1" role="dialog" aria-labelledby="opcionesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="opcionesModalLabel">Seleccionar Fecha, Cuotas y Transferencia</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Selector de fecha -->
+          <div class="form-group">
+            <label for="fecha-selector">Seleccionar Fecha</label>
+            <input type="date" id="fecha-selector" class="form-control" />
+          </div>
+          <!-- Selector numérico -->
+          <div class="form-group">
+            <label for="cuotas-selector">Seleccionar Cuotas</label>
+            <input type="number" id="cuotas-selector" class="form-control" min="1" max="100" />
+          </div>
+          <!-- Desplegable de transferencia -->
+          <div class="form-group">
+            <label for="transferencia-selector">Transferencia</label>
+            <select id="transferencia-selector" class="form-control">
+              <!-- Aquí se agregarán dinámicamente las tarjetas -->
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" onclick="resetearOpciones()" data-bs-dismiss="modal">
+            Restaurar
+          </button>
+          <button type="button" class="btn btn-primary" onclick="confirmarOpciones()">
+            Seleccionar
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para gestionar tarjetas -->
+  <div class="modal fade" id="tarjetasModal" tabindex="-1" role="dialog" aria-labelledby="tarjetasModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="tarjetasModalLabel">Tarjetas</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Botón para agregar una nueva tarjeta -->
+          <button type="button" class="btn btn-success mb-3" id="agregar-tarjeta-btn">
+            Agregar tarjeta
+          </button>
+
+          <!-- Contenedor para el acordeón de tarjetas -->
+          <div id="tarjetas-lista">
+            <!-- Aquí se iteran las tarjetas en el acordeón -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para gestionar estimados -->
+  <div class="modal fade" id="estimadosModal" tabindex="-1" role="dialog" aria-labelledby="estimadosModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="estimadosModalLabel">Estimados</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Botón para agregar una nueva simulación -->
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <button type="button" class="btn btn-success" id="agregar-estimado-btn">
+              Agregar estimado
+            </button>
+          </div>
+
+          <!-- Contenedor para el acordeón de estimados -->
+          <div id="estimados-lista">
+            <!-- Aquí se iteran las simulaciones en el acordeón -->
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="./script.js"></script>
   <script src="./opciones.js"></script>
   <script src="./tarjetas.js"></script>

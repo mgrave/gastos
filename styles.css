@@ -1,3 +1,159 @@
+/* Estilos generales */
+body {
+  font-family: 'Lato';
+}
+
+.navbar-toggler-icon {
+  background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"%3E%3Cpath stroke="rgba(255,255,255,.5)" stroke-width="2" d="M0 7h30M0 15h30M0 23h30"/%3E%3C/svg%3E');
+}
+
+.navbar-nav .nav-link {
+  color: #fff;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #f0f0f0;
+}
+
+.btn-group-custom {
+  margin-top: 1rem;
+}
+
+.btn-cycle {
+  width: 100%;
+}
+
+.table-container {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+}
+
+.table-container table {
+  width: 100%;
+}
+
+.footer {
+  background-color: #ffffff;
+  padding: 1rem;
+  box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.footer .btn-group-custom {
+  margin-top: 1rem;
+}
+
+.footer .input-group {
+  margin-top: 1rem;
+}
+
+#tipoTarjeta {
+  font-weight: bold;
+}
+
+#balance {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.modal-content {
+  border-radius: 0.5rem;
+}
+
+.modal-header .btn-close {
+  margin-left: auto;
+}
+
+#opcionesModal .modal-footer .btn-outline-secondary {
+  margin-right: auto;
+}
+
+#tarjetas-lista,
+#estimados-lista {
+  margin-top: 1rem;
+}
+
+.btn-cycle {
+  flex: 1;
+  border-radius: 0.25rem;
+}
+
+.btn-success {
+  border-color: #28a745;
+  background-color: #28a745;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+}
+
+.btn-outline-secondary {
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #e2e6ea;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.btn-info:hover {
+  background-color: #138496;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+#sin-movimientos {
+  font-size: 1.2rem;
+}
+
+.table-container {
+  margin-bottom: 1rem;
+}
+
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-brand {
+  font-size: 1.5rem;
+}
+
+.navbar-nav {
+  margin-left: auto;
+}
+
+.navbar-toggler-icon {
+  background-image: url('data:image/svg+xml;charset=utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30"%3E%3Cpath stroke="rgba(255,255,255,.5)" stroke-width="2" d="M0 7h30M0 15h30M0 23h30"/%3E%3C/svg%3E');
+}
+
+
+
+
+
+
+
 .btn-group-custom .btn {
     width: 30%;
   }
@@ -65,5 +221,32 @@
     display: block;
   }
   
-  
-  
+/* Elimina el borde y el marco del botón de cierre */
+.close {
+  border: none;
+  outline: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Asegúrate de que el botón de cierre sea visible */
+.close span {
+  font-size: 1.5rem; /* Ajusta el tamaño del icono si es necesario */
+}
+
+/* Elimina el borde y el marco del botón de la hamburguesa */
+.navbar-toggler {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Asegura que los elementos del menú tengan márgenes adecuados */
+.navbar-nav .nav-item {
+  margin: 0 1rem; /* Ajusta el margen como necesites */
+}
+
+/* Opcional: ajusta el padding dentro de los elementos del menú */
+.navbar-nav .nav-link {
+  padding: 0.5rem 1rem;
+}

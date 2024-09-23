@@ -1,9 +1,9 @@
 var dataJson = {
   "tarjetas": [
     { "cardId": 1, "nombre": "Visa", "tipo": "credito", "color": "black", "factura": 12, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
-    { "cardId": 2, "nombre": "Amex", "tipo": "credito", "color": "red", "factura": 16, "pago": 30, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
+    { "cardId": 2, "nombre": "Amex", "tipo": "credito", "color": "salmon", "factura": 16, "pago": 30, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
     { "cardId": 3, "nombre": "Master", "tipo": "credito", "color": "blue", "factura": 16, "pago": 30, "control": 700, "parcial": 500, "balance": 2500, "activo": true },
-    { "cardId": 4, "nombre": "BCP", "tipo": "debito", "color": "red", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
+    { "cardId": 4, "nombre": "BCP", "tipo": "debito", "color": "hotpink", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
     { "cardId": 5, "nombre": "Prestamo", "tipo": "debito", "color": "blue", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true }
   ],
   "conceptos": [

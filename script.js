@@ -283,7 +283,7 @@ document.getElementById('backup-file-input').addEventListener('change', function
 // Agregar esto al final del script, justo antes de cerrar la etiqueta
 document.addEventListener("DOMContentLoaded", function () {
   cargarEstado();
-  resetearOpciones();
+  cancelarOpciones();
   cambiarMovimiento();
   cambiarTarjeta();
   guardarEstado(); // Guardar el estado después de inicializar la página

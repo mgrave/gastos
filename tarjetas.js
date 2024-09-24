@@ -77,7 +77,8 @@ document
 
     //tarjetaPivot = tarjetas[1].cardId
     cambiarTarjeta();
-
+	
+	alert("Se eliminó la tarjeta " + nombre.value + " con exito.");
     
   }
   
@@ -140,12 +141,10 @@ function guardarTarjeta(cardId) {
       pagoInput.classList.remove('is-invalid');
     }
 
-    console.log("Tarjeta  pivot: "+ tarjetaPivot);
-    
     dataJson.tarjetas = tarjetas;
     guardarEstado();
     renderTarjetas();    
-    
+    alert("Se guardo la tarjeta " + nombre.value + " con exito.");
   }
 }
 
@@ -172,14 +171,21 @@ function renderTarjetas() {
       <div class="accordion" id="tarjetaAccordion-${cardId}">
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center" id="heading-${cardId}"
-               style="background-color: ${tarjeta.color}; cursor: pointer;" 
-               data-bs-toggle="collapse" data-bs-target="#collapse-${cardId}" 
-               aria-expanded="${isExpanded}" aria-controls="collapse-${cardId}" data-bs-parent="#tarjetas-lista">
-            <h5 class="mb-0 text-uppercase text-white" style="text-decoration: none;">
-              <i class="${iconoTipoTarjeta}"></i> ${tarjeta.nombre || 'NOMBRE TARJETA'} ${nuevaTarjetaTexto} - ${tarjeta.balance}
-            </h5>
-            <i class="fas fa-chevron-down text-white"></i>
-          </div>
+			 style="background-color: ${tarjeta.color}; cursor: pointer;" 
+			 data-bs-toggle="collapse" data-bs-target="#collapse-${cardId}" 
+			 aria-expanded="${isExpanded}" aria-controls="collapse-${cardId}" data-bs-parent="#tarjetas-lista">
+		  
+		  <h5 class="mb-0 text-uppercase text-white" style="text-decoration: none;">
+			<i class="${iconoTipoTarjeta}"></i> ${tarjeta.nombre || 'NOMBRE TARJETA'} ${nuevaTarjetaTexto}
+		  </h5>
+
+		  <!-- Mostrar el balance a la derecha con "S/." en lugar del guion -->
+		  <div class="d-flex align-items-center">
+			<span class="text-white me-2">S/. ${tarjeta.balance}</span>
+			<i class="fas fa-chevron-down text-white"></i>
+		  </div>
+		</div>
+
           <div id="collapse-${cardId}" class="collapse ${isExpanded ? 'show' : ''}" 
                aria-labelledby="heading-${cardId}" data-bs-parent="#tarjetas-lista">
             <div class="card-body">

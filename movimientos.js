@@ -16,10 +16,11 @@ function agregarMovimiento() {
   const monto = parseFloat(document.getElementById("monto").value); // Convertir monto a número
   const cuotas = parseInt(document.getElementById("cuotas-selector").value) || 1; // Obtener el valor de cuotas, por defecto 1
   const montoPorCuota = parseFloat(monto / cuotas).toFixed(2); // Monto dividido entre cuotas (o total si es 1)
-  const fechaSeleccionada = document.getElementById("fecha-selector").value || fechaActual; // Si no hay fecha seleccionada, usar la fecha actual
+  const fechaSeleccionada = document.getElementById("fecha-selector").value; // debe obtener la fecha de opciones
+  console.log("agregarMovimiento fecha " + fechaSeleccionada)
   const detalleMov = document.getElementById("detalle").value;
   const tarjetaTransferencia = document.getElementById('transferencia-selector');
-  console.log("agregarMovimiento fecha " + fechaSeleccionada)
+  
   if (monto && monto > 0) { // Validar que el monto sea válido
     const fechaCuota = new Date(fechaSeleccionada); // Crear una nueva fecha basada en la fecha seleccionada o actual
 

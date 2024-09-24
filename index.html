@@ -84,9 +84,9 @@
       </div>
       <div class="input-group mt-2">
         <button class="btn btn-outline-secondary" id="opciones" data-bs-toggle="modal" data-bs-target="#opcionesModal">
-          <i id="fecha-icon" class="fas fa-tasks"></i>
+          <i id="opcion" class="fas fa-tasks"></i>
         </button>
-        <button class="btn btn-outline-secondary" id="reset" onclick="resetearOpciones()">
+        <button class="btn btn-outline-secondary" id="reset" onclick="cancelarOpciones()">
           <i class="fas fa-undo"></i>
         </button>
         <input type="number" class="form-control" id="monto" placeholder="Monto del movimiento" />
@@ -127,15 +127,12 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" onclick="resetearOpciones()" data-bs-dismiss="modal">
-            Restaurar
+          <button type="button" class="btn btn-outline-secondary" onclick="cancelarOpciones()" data-bs-dismiss="modal">
+            Cancelar
           </button>
-          <button type="button" class="btn btn-primary" onclick="confirmarOpciones()">
-            Seleccionar
-          </button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Cerrar
-          </button>
+          <button type="button" class="btn btn-primary" onclick="guardarOpciones()">
+            Guardar
+          </button>          
         </div>
       </div>
     </div>

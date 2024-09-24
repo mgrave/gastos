@@ -159,10 +159,10 @@ function actualizarTotalEstimado() {
 }
 
 // Inicializar el botón de agregar estimado
-document.getElementById('agregar-estimado-btn').addEventListener('click', agregarEstimado);
+//document.getElementById('agregar-estimado-btn').addEventListener('click', agregarEstimado);
 
 // Inicializar el botón de pagar todos
-document.getElementById('pagar-todo-btn').addEventListener('click', pagarTodosEstimados);
+//document.getElementById('pagar-todo-btn').addEventListener('click', pagarTodosEstimados);
 
 
 

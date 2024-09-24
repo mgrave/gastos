@@ -11,6 +11,7 @@ document.getElementById("fecha-selector").addEventListener("change", function ()
 });
 document.getElementById("cuotas-selector").addEventListener("change", function () {
   formularioModificado = true;
+  
   // Limpiar el selector de transferencia si se seleccionan cuotas
   document.getElementById("transferencia-selector").value = "";
 });
@@ -73,7 +74,6 @@ function cambiarMovimiento() {
   }
 
   cambiarConcepto();
-  resetearOpciones();
 
 }
 
@@ -119,13 +119,22 @@ function cambiarConcepto() {
 
 
 // Función para confirmar la fecha seleccionada
-function confirmarOpciones() {
-  const fechaSeleccionadaInput = document.getElementById("fecha-selector").value;
-  if (fechaSeleccionadaInput) {
-    const fechaLocal = new Date(fechaSeleccionadaInput + "T00:00:00");
-    fechaSeleccionada = fechaLocal.toISOString().split("T")[0];
-  } else {
-    fechaSeleccionada = new Date().toISOString().split("T")[0];
+function confirmarOpciones() {  
+  const fechaInput = document.getElementById("fecha-selector").value;
+  
+  
+  if (fechaInput) {
+    const fechaLocal = new Date(fechaInput);
+    
+    // Aplicar la zona horaria UTC-5 (Lima, Perú)
+    const utcOffset = -5 * 60; // Diferencia horaria en minutos (-5 horas)
+    const fechaLocalOffset = new Date(fechaLocal.getTime() + (fechaLocal.getTimezoneOffset() * 60000) + (utcOffset * 60000));
+
+    const año = fechaLocalOffset.getFullYear();
+    const mes = String(fechaLocalOffset.getMonth() + 1).padStart(2, '0');
+    const dia = String(fechaLocalOffset.getDate()).padStart(2, '0');
+    fechaSeleccionada = `${año}-${mes}-${dia}`;
+    console.log("confirmarOpciones fecha "+fechaSeleccionada);
   }
   
   // Guardar la transferencia seleccionada
@@ -138,12 +147,21 @@ function confirmarOpciones() {
 
 // Resetear valores del formulario
 function resetearOpciones() {
-  const hoy = new Date();
-  const hoyString = hoy.toISOString().split("T")[0];
-  document.getElementById("fecha-selector").value = hoyString;
+
+  const fechaLocal = new Date(); // Aplicar la zona horaria UTC-5 (Lima, Perú)
+  const utcOffset = -5 * 60; // Diferencia horaria en minutos (-5 horas)
+  const fechaLocalOffset = new Date(fechaLocal.getTime() + (fechaLocal.getTimezoneOffset() * 60000) + (utcOffset * 60000));
+  const año = fechaLocalOffset.getFullYear();
+  const mes = String(fechaLocalOffset.getMonth() + 1).padStart(2, '0');
+  const dia = String(fechaLocalOffset.getDate()).padStart(2, '0');
+  let fechaSeleccionada = `${año}-${mes}-${dia}`;
+  console.log("resetearOpciones fecha "+fechaSeleccionada);
+
+  //const hoy = new Date();
+  //const hoyString = hoy.toISOString().split("T")[0];
+  document.getElementById("fecha-selector").value = fechaSeleccionada;
   document.getElementById("cuotas-selector").value = 1;
-  document.getElementById("transferencia-selector").value = "";
-  fechaSeleccionada = hoyString;
+  document.getElementById("transferencia-selector").value = "";  
   transferenciaSeleccionada = ''; // Resetear la transferencia seleccionada
 
   actualizarOpciones();

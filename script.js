@@ -40,7 +40,15 @@ let conceptoPivot = 0;
 let movimientos = [];
 let conceptos = [];
 let idCounter = 1;
-let fechaSeleccionada = new Date().toISOString().split("T")[0];
+
+const fechaLocal = new Date(); // Aplicar la zona horaria UTC-5 (Lima, Perú)
+const utcOffset = -5 * 60; // Diferencia horaria en minutos (-5 horas)
+const fechaLocalOffset = new Date(fechaLocal.getTime() + (fechaLocal.getTimezoneOffset() * 60000) + (utcOffset * 60000));
+const año = fechaLocalOffset.getFullYear();
+const mes = String(fechaLocalOffset.getMonth() + 1).padStart(2, '0');
+const dia = String(fechaLocalOffset.getDate()).padStart(2, '0');
+let fechaSeleccionada = `${año}-${mes}-${dia}`;
+console.log("fecha actual "+fechaSeleccionada);
 
 
 document.querySelectorAll('.navbar-nav .nav-item').forEach(function (item) {
@@ -61,7 +69,7 @@ const calcularEstadoCuenta = (movimientosInput) => {
   const tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
   //const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
   const tarjetaSeleccionada = tarjetasActivas.find(tarjeta => tarjeta.cardId === tarjetaPivot);
-  
+
 
   const diaCorte = tarjetaSeleccionada.factura;
   const diaPago = tarjetaSeleccionada.pago;
@@ -128,7 +136,7 @@ const calcularEstadoCuenta = (movimientosInput) => {
     const siguienteMes = mes === 12 ? 1 : mes + 1;
     const siguienteAno = siguienteMes === 1 ? año + 1 : año;
     const fechaCorte = new Date(`${siguienteAno}-${siguienteMes}-${diaCorte}`);
-    const fechaPago = `${tarjetaSeleccionada.pago}/${siguienteMes + 1}`;
+    const fechaPago = `${tarjetaSeleccionada.pago}/${siguienteMes === 12 ? 1 : siguienteMes + 1}`;
     fechaCorte.setUTCHours(0, 0, 0, 0); // Establece la hora a medianoche (00:00:00) en UTC
 
     if (tarjetaSeleccionada.tipo === "credito") {
@@ -152,16 +160,16 @@ const calcularEstadoCuenta = (movimientosInput) => {
       const [año, mes] = mesAno.split('-').map(Number);
       const siguienteMes = mes === 12 ? 1 : mes + 1;
       const siguienteAno = siguienteMes === 1 ? año + 1 : año;
-  
+
       const fechaCorte = new Date(`${siguienteAno}-${siguienteMes}-${diaCorte}`);
       const fechaPago = new Date(`${siguienteAno}-${siguienteMes}-${diaPago}`);
-  
+
       console.log(`\nFactura del siguiente mes (${siguienteAno}-${siguienteMes}):`);
       console.log(`  Fecha de corte: ${fechaCorte.toISOString().split('T')[0]}`);
       console.log(`  Fecha de pago: ${fechaPago.toISOString().split('T')[0]}`);
       console.log(`  Saldo pendiente acumulado: ${saldoPendienteMesAnterior}`);
     }
-    
+
     // Calcular el monto total a pagar (gastos - abonos + saldo pendiente)
     const totalGastos = Object.values(estadoCuenta).reduce((acc, curr) => acc + curr.gastos, 0);
     const totalAbonos = Object.values(estadoCuenta).reduce((acc, curr) => acc + curr.abonos, 0);
@@ -199,7 +207,7 @@ function cargarEstado() {
   const estadoGuardado = localStorage.getItem('data');
   //console.log("Recuperando estado..." + JSON.stringify(estadoGuardado, null, 2));
   if (estadoGuardado) {
-    const estado = JSON.parse(estadoGuardado);	
+    const estado = JSON.parse(estadoGuardado);
     // Asignar los datos recuperados de manera correcta
     dataJson.tarjetas = estado.tarjetas || [];
     dataJson.conceptos = estado.conceptos || [];
@@ -211,34 +219,34 @@ function cargarEstado() {
 document
   .querySelector("#descargar_backup")
   .addEventListener("click", function () {
-  console.log("Descargar backup... " + JSON.stringify(dataJson, null, 2))
-  const datos = {
-    tarjetas: dataJson.tarjetas,
-    conceptos: dataJson.conceptos,
-    movimientos: movimientos,
-    simulaciones: simulaciones
-  };
+    console.log("Descargar backup... " + JSON.stringify(dataJson, null, 2))
+    const datos = {
+      tarjetas: dataJson.tarjetas,
+      conceptos: dataJson.conceptos,
+      movimientos: movimientos,
+      simulaciones: simulaciones
+    };
 
-  const json = JSON.stringify(datos, null, 2);
-  const blob = new Blob([json], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "backup.json";
-  a.click();
-});
+    const json = JSON.stringify(datos, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "backup.json";
+    a.click();
+  });
 
 
 
 document
   .querySelector("#cargar_backup")
   .addEventListener("click", function () {
-  // Obtén el elemento input de archivo
-  const backupFileInput = document.getElementById('backup-file-input');
+    // Obtén el elemento input de archivo
+    const backupFileInput = document.getElementById('backup-file-input');
 
-  // Simula el clic en el input de archivo
-  backupFileInput.click();
-});
+    // Simula el clic en el input de archivo
+    backupFileInput.click();
+  });
 
 // Manejar el cambio en el input de archivo
 document.getElementById('backup-file-input').addEventListener('change', function () {

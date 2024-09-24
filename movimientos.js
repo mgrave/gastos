@@ -4,24 +4,32 @@
 // Función para agregar movimiento
 function agregarMovimiento() {
 
+  const fechaLocal = new Date(); // Aplicar la zona horaria UTC-5 (Lima, Perú)
+  const utcOffset = -5 * 60; // Diferencia horaria en minutos (-5 horas)
+  const fechaLocalOffset = new Date(fechaLocal.getTime() + (fechaLocal.getTimezoneOffset() * 60000) + (utcOffset * 60000));
+  const año = fechaLocalOffset.getFullYear();
+  const mes = String(fechaLocalOffset.getMonth() + 1).padStart(2, '0');
+  const dia = String(fechaLocalOffset.getDate()).padStart(2, '0');
+  let fechaActual = `${año}-${mes}-${dia}`;
+
   let tarjetas = dataJson.tarjetas;
   const monto = parseFloat(document.getElementById("monto").value); // Convertir monto a número
   const cuotas = parseInt(document.getElementById("cuotas-selector").value) || 1; // Obtener el valor de cuotas, por defecto 1
   const montoPorCuota = parseFloat(monto / cuotas).toFixed(2); // Monto dividido entre cuotas (o total si es 1)
-  const fechaSeleccionada = document.getElementById("fecha-selector").value || new Date().toISOString().split('T')[0]; // Si no hay fecha seleccionada, usar la fecha actual
+  const fechaSeleccionada = document.getElementById("fecha-selector").value || fechaActual; // Si no hay fecha seleccionada, usar la fecha actual
   const detalleMov = document.getElementById("detalle").value;
   const tarjetaTransferencia = document.getElementById('transferencia-selector');
-  
+  console.log("agregarMovimiento fecha " + fechaSeleccionada)
   if (monto && monto > 0) { // Validar que el monto sea válido
     const fechaCuota = new Date(fechaSeleccionada); // Crear una nueva fecha basada en la fecha seleccionada o actual
 
-const tarjetasActivas = tarjetas.filter(tarjeta0 => tarjeta0.activo);
+    const tarjetasActivas = tarjetas.filter(tarjeta0 => tarjeta0.activo);
 
-const tarjetaOrigen = tarjetasActivas.find(tarjeta1 => tarjeta1.cardId === parseInt(tarjetaPivot));
-const tarjetaDestino = tarjetasActivas.find(tarjeta2 => tarjeta2.cardId === parseInt(tarjetaTransferencia.value));
+    const tarjetaOrigen = tarjetasActivas.find(tarjeta1 => tarjeta1.cardId === parseInt(tarjetaPivot));
+    const tarjetaDestino = tarjetasActivas.find(tarjeta2 => tarjeta2.cardId === parseInt(tarjetaTransferencia.value));
 
     // Iterar por cada cuota y generar un movimiento para cada una
-    for (let i = 0; i < cuotas; i++) {      
+    for (let i = 0; i < cuotas; i++) {
       const fechaMovimiento = new Date(fechaCuota);
       fechaMovimiento.setMonth(fechaCuota.getMonth() + i); // Aumentar la fecha en meses según la cuota
       const nuevoMovimiento = {
@@ -64,9 +72,9 @@ const tarjetaDestino = tarjetasActivas.find(tarjeta2 => tarjeta2.cardId === pars
     // Limpiar campos después de la operación
     document.getElementById("monto").value = ""; // Limpiar el input de monto
     document.getElementById("detalle").value = ""; // Limpiar el input de texto        
-	document.getElementById('transferencia-selector').value = "";
+    document.getElementById('transferencia-selector').value = "";
     document.getElementById("cuotas-selector").value = 1; // Limpiar el selector de cuotas
-	    
+
     $("#opcionesModal").modal("hide"); // Cerrar el modal de selección de fecha
     actualizarOpciones();
   } else {
@@ -134,12 +142,14 @@ function actualizarMovimientos() {
 
       const tdFecha = document.createElement("td");
       tdFecha.textContent = dia; // Mostrar solo el día de la fecha
+      tdFecha.className = tipoMovimiento.class;
 
       const tdDetalle = document.createElement("td");
       //tdConcepto.textContent = concepto ? concepto.nombre : tipoMovimiento.alias;
       let detalle = movimiento.detalle ? movimiento.detalle : concepto.nombre;
-	  let cuotas = movimiento.cuota ? `[${movimiento.cuota}]`: "";
+      let cuotas = movimiento.cuota ? `[${movimiento.cuota}]` : "";
       tdDetalle.textContent = `${detalle} ${cuotas}`
+      tdDetalle.className = tipoMovimiento.class;
 
       //const tdDetalle = document.createElement("td");
       //tdDetalle.textContent = movimiento.detalle;
@@ -148,10 +158,10 @@ function actualizarMovimientos() {
       tdMonto.textContent = parseFloat(movimiento.monto).toFixed(2);
       tdMonto.className =
         movimiento.tipo === "ingreso"
-          ? "text-success"
+          ? "text-success align-right " + tipoMovimiento.class
           : movimiento.tipo === "egreso"
-            ? "text-danger"
-            : "";
+            ? "text-danger align-right " + tipoMovimiento.class
+            : "align-right " + tipoMovimiento.class;
 
       tr.appendChild(tdFecha);
       tr.appendChild(tdDetalle);
@@ -161,6 +171,7 @@ function actualizarMovimientos() {
       // Agregar botón de eliminar
 
       const tdEliminar = document.createElement("td");
+      tdEliminar.className = "align-right " + tipoMovimiento.class;
       if (concepto) {
         tdEliminar.innerHTML = `<button class="btn btn-danger btn-sm" onclick="eliminarMovimiento(${movimiento.movId})">
     <i class="fas fa-trash-alt"></i>

@@ -171,15 +171,17 @@ function renderTarjetas() {
     const tarjetaHtml = `
       <div class="accordion" id="tarjetaAccordion-${cardId}">
         <div class="card">
-          <div class="card-header d-flex justify-content-between align-items-center" id="heading-${cardId}">
-            <h5 class="mb-0 text-uppercase" style="cursor: pointer; text-decoration: none;" onclick="toggleAccordion(${cardId})">
+          <div class="card-header d-flex justify-content-between align-items-center" id="heading-${cardId}"
+               style="background-color: ${tarjeta.color}; cursor: pointer;" 
+               data-bs-toggle="collapse" data-bs-target="#collapse-${cardId}" 
+               aria-expanded="${isExpanded}" aria-controls="collapse-${cardId}" data-bs-parent="#tarjetas-lista">
+            <h5 class="mb-0 text-uppercase text-white" style="text-decoration: none;">
               <i class="${iconoTipoTarjeta}"></i> ${tarjeta.nombre || 'NOMBRE TARJETA'} ${nuevaTarjetaTexto} - ${tarjeta.balance}
             </h5>
-            <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-${cardId}" aria-expanded="${isExpanded}" aria-controls="collapse-${cardId}">
-              <i class="fas fa-chevron-down"></i>
-            </button>
+            <i class="fas fa-chevron-down text-white"></i>
           </div>
-          <div id="collapse-${cardId}" class="collapse ${isExpanded ? 'show' : ''}" aria-labelledby="heading-${cardId}" data-parent="#tarjetas-lista">
+          <div id="collapse-${cardId}" class="collapse ${isExpanded ? 'show' : ''}" 
+               aria-labelledby="heading-${cardId}" data-bs-parent="#tarjetas-lista">
             <div class="card-body">
               <form id="tarjetaForm-${cardId}">
                 <div class="form-group">
@@ -222,7 +224,7 @@ function renderTarjetas() {
                   <input type="number" class="form-control" id="balance-${cardId}" value="${tarjeta.balance}">
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center  mt-2">
                   <!-- Switch para activar/desactivar tarjeta -->
                   <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" role="switch" id="activo-${cardId}" ${tarjeta.activo ? 'checked' : ''}>
@@ -240,7 +242,7 @@ function renderTarjetas() {
           </div>
         </div>
       </div>`;
-    
+
     tarjetasLista.insertAdjacentHTML('beforeend', tarjetaHtml);
   });
 }

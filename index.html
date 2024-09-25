@@ -76,10 +76,10 @@
   <div class="footer">
     <div class="container">
       <div class="d-flex align-items-center">
-        <input type="text" id="detalle" class="form-control border-0 bg-transparent" placeholder="Ingresa tu detalle" style="flex: 1; max-width: none;" />
-        <h5 class="ml-3 mb-0">
+        <input type="text" id="detalle" class="form-control border-0 bg-transparent" placeholder="Ingresa tu detalle" style="flex: 1; max-width: none; padding-left: 0px;" />
+        <h5 class="ml-auto mb-0 d-flex align-items-center">
           <span id="tipoTarjeta" class="tipo-tarjeta">Balance</span> 
-          <span id="balance" class="balance-positive">0.00</span>
+          <span id="balance" class="balance-positive btn btn-sm" style="width: auto; padding-left: 1rem;">0.00</span>
         </h5>
       </div>
       <div class="input-group mt-2">
@@ -182,19 +182,33 @@
             </button>
           </div>
 
+          
+
           <!-- Contenedor para el acordeón de estimados -->
           <div id="estimados-lista">
             <!-- Aquí se iteran las simulaciones en el acordeón -->
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Cerrar
-          </button>
+        <div class="modal-footer d-flex justify-content-between">
+          <h5 class="mb-0 text-bold">Total: S/. <span id="total-estimado" class="text-bold">0.00</span></h5>
+          <div>
+            <button type="button" class="btn btn-primary" id="pagar-todo-btn">Pagar todo</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
         </div>
+        
       </div>
     </div>
   </div>
+
+  <!-- Spinner de Bootstrap para mostrar mientras se procesa el archivo -->
+<div id="processing-indicator" class="d-none">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Cargando...</span>
+  </div>
+  <p>Procesando...</p>
+</div>
+
 
 
 

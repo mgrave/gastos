@@ -123,3 +123,13 @@ body {
 .align-right {
   text-align: end;
 }
+
+
+#processing-indicator {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 1050; /* Asegúrate de que el spinner esté encima de otros elementos */
+}

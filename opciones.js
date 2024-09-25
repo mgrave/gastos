@@ -127,11 +127,6 @@ function actualizarOpciones() {
 
 
 
-
-
-
-
-
 // Función para cambiar movimiento
 function cambiarMovimiento() {
   movimientoPivot = (movimientoPivot + 1) % tipoMovimientoActivos.length; // Alterna entre "ingreso" y "egreso"

@@ -238,46 +238,50 @@ document
 
 
 
-document
-  .querySelector("#cargar_backup")
-  .addEventListener("click", function () {
+  document.querySelector("#cargar_backup").addEventListener("click", function () {
     // Obtén el elemento input de archivo
     const backupFileInput = document.getElementById('backup-file-input');
-
+  
     // Simula el clic en el input de archivo
     backupFileInput.click();
   });
-
-// Manejar el cambio en el input de archivo
-document.getElementById('backup-file-input').addEventListener('change', function () {
-  const file = this.files[0];
-  if (file) {
-    const reader = new FileReader();
-
-    reader.onload = function (event) {
-      const fileContent = event.target.result;
-
-      // Si el archivo es un JSON, puedes parsearlo y utilizar los datos
-      try {
-        const data = JSON.parse(fileContent);
-        dataJson.tarjetas = data.tarjetas;
-        dataJson.conceptos = data.conceptos;
-        movimientos = data.movimientos;
-        simulaciones = data.simulaciones;
-
-        console.log('Datos cargados:', JSON.stringify(data, null, 2));
-
-
-        // Aquí puedes integrar los datos cargados a tu aplicación
-        // Por ejemplo: actualizar el estado de la aplicación con los datos cargados
-      } catch (e) {
-        console.error('Error al analizar el archivo JSON:', e);
-      }
-    };
-
-    reader.readAsText(file);
-  }
-});
+  
+  // Manejar el cambio en el input de archivo
+  document.getElementById('backup-file-input').addEventListener('change', function () {
+    const file = this.files[0];
+    if (file) {
+      // Mostrar el spinner de procesamiento
+      document.getElementById('processing-indicator').classList.remove('d-none');
+  
+      const reader = new FileReader();
+  
+      reader.onload = function (event) {
+        const fileContent = event.target.result;
+  
+        // Si el archivo es un JSON, puedes parsearlo y utilizar los datos
+        try {
+          const data = JSON.parse(fileContent);
+          dataJson.tarjetas = data.tarjetas;
+          dataJson.conceptos = data.conceptos;
+          movimientos = data.movimientos;
+          simulaciones = data.simulaciones;
+  
+          console.log('Datos cargados:', JSON.stringify(data, null, 2));
+  
+          // Aquí puedes integrar los datos cargados a tu aplicación
+          // Por ejemplo: actualizar el estado de la aplicación con los datos cargados
+        } catch (e) {
+          console.error('Error al analizar el archivo JSON:', e);
+        } finally {
+          // Ocultar el spinner de procesamiento
+          document.getElementById('processing-indicator').classList.add('d-none');
+        }
+      };
+  
+      reader.readAsText(file);
+    }
+  });
+  
 
 
 // Agregar esto al final del script, justo antes de cerrar la etiqueta

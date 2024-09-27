@@ -1,10 +1,11 @@
 var dataJson = {
   "tarjetas": [
-    { "cardId": 1, "nombre": "Visa", "tipo": "credito", "color": "black", "factura": 12, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
+    /*{ "cardId": 1, "nombre": "Visa", "tipo": "credito", "color": "black", "factura": 12, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
     { "cardId": 2, "nombre": "Amex", "tipo": "credito", "color": "salmon", "factura": 16, "pago": 30, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
     { "cardId": 3, "nombre": "Master", "tipo": "credito", "color": "blue", "factura": 16, "pago": 30, "control": 700, "parcial": 500, "balance": 2500, "activo": true },
     { "cardId": 4, "nombre": "BCP", "tipo": "debito", "color": "hotpink", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
-    { "cardId": 5, "nombre": "Prestamo", "tipo": "debito", "color": "blue", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true }
+    { "cardId": 5, "nombre": "Prestamo", "tipo": "debito", "color": "blue", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },*/
+    { "cardId": 6, "nombre": "Demo", "tipo": "debito", "color": "blue", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 0, "activo": true }
   ],
   "conceptos": [
     { "conceptId": 1, "nombre": "Pago", "tipo_movimiento": "ingreso", "color": "green", "activo": true },
@@ -35,20 +36,33 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-let tipoMovimientoActivos = dataConf.tipoMovimiento.filter(
-  (tipoMov) => tipoMov.activo
-);
 
-let conceptosActivos = dataJson.conceptos.filter(
-  (conceptos) => conceptos.activo
-);
 
 let tarjetaPivot = 0;
 let movimientoPivot = 0;
 let conceptoPivot = 0;
+let presupuestos = [];
 let movimientos = [];
 let conceptos = [];
+let tarjetas = [];
 let idCounter = 1;
+
+if(tarjetas.length == 0){
+  tarjetas = dataJson.tarjetas;
+}
+
+if(conceptos.length == 0){
+  conceptos = dataJson.conceptos;
+}
+
+let tipoMovimientoActivos = dataConf.tipoMovimiento.filter(
+  (tipoMov) => tipoMov.activo
+);
+
+//let conceptosActivos = dataJson.conceptos.filter( //ORIG
+let conceptosActivos = conceptos.filter( 
+  (conceptos) => conceptos.activo
+);
 
 const fechaLocal = new Date(); // Aplicar la zona horaria UTC-5 (Lima, Perú)
 const utcOffset = -5 * 60; // Diferencia horaria en minutos (-5 horas)
@@ -74,7 +88,7 @@ document.querySelectorAll('.navbar-nav .nav-item').forEach(function (item) {
 const calcularEstadoCuenta = (movimientosInput) => {
   // Crear un objeto para almacenar la información de cada mes
   const estadoCuenta = {};
-  const tarjetas = dataJson.tarjetas;
+  //const tarjetas = dataJson.tarjetas; //ORIG
   const tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
   //const tarjetaSeleccionada = tarjetasActivas[tarjetaPivot];
   const tarjetaSeleccionada = tarjetasActivas.find(tarjeta => tarjeta.cardId === tarjetaPivot);
@@ -201,12 +215,12 @@ const calcularEstadoCuenta = (movimientosInput) => {
 
 // Guarda información en el localStorage
 function guardarEstado() {
-  //console.log("Guardando estado... " + JSON.stringify(tarjetas, null, 2))
+  console.log("Guardando estado... " + JSON.stringify(presupuestos, null, 2))
   const data = {
-    tarjetas: dataJson.tarjetas,
-    conceptos: dataJson.conceptos,
+    tarjetas: tarjetas, //tarjetas: dataJson.tarjetas, //ORIG
+    conceptos: conceptos, //conceptos: dataJson.conceptos, //ORIG
     movimientos: movimientos,
-    simulaciones: simulaciones
+    presupuestos: presupuestos
   };
   localStorage.setItem('data', JSON.stringify(data));
 }
@@ -218,10 +232,10 @@ function cargarEstado() {
   if (estadoGuardado) {
     const estado = JSON.parse(estadoGuardado);
     // Asignar los datos recuperados de manera correcta
-    dataJson.tarjetas = estado.tarjetas || [];
-    dataJson.conceptos = estado.conceptos || [];
+    tarjetas = estado.tarjetas || [];//dataJson.tarjetas = estado.tarjetas || []; //ORIG
+    conceptos = estado.conceptos || [];//dataJson.conceptos = estado.conceptos || []; //ORIG
     movimientos = estado.movimientos || [];
-    simulaciones = estado.simulaciones || [];
+    presupuestos = estado.presupuestos || [];
   }
 }
 
@@ -230,10 +244,10 @@ document
   .addEventListener("click", function () {
     console.log("Descargar backup... " + JSON.stringify(dataJson, null, 2))
     const datos = {
-      tarjetas: dataJson.tarjetas,
-      conceptos: dataJson.conceptos,
+      tarjetas: tarjetas, //tarjetas: dataJson.tarjetas, //ORIG
+      conceptos: conceptos, //conceptos: dataJson.conceptos, //ORIG
       movimientos: movimientos,
-      simulaciones: simulaciones
+      presupuestos: presupuestos
     };
 
     const json = JSON.stringify(datos, null, 2);
@@ -246,50 +260,74 @@ document
   });
 
 
+// Iniciar el proceso de selección del archivo
+document.querySelector("#cargar_backup").addEventListener("click", function () {
+  // Simula el clic en el input de archivo
+  const backupFileInput = document.getElementById('backup-file-input');
+  backupFileInput.click();
+});
 
-  document.querySelector("#cargar_backup").addEventListener("click", function () {
-    // Obtén el elemento input de archivo
-    const backupFileInput = document.getElementById('backup-file-input');
-  
-    // Simula el clic en el input de archivo
-    backupFileInput.click();
-  });
-  
-  // Manejar el cambio en el input de archivo
-  document.getElementById('backup-file-input').addEventListener('change', function () {
-    const file = this.files[0];
-    if (file) {
-      // Mostrar el spinner de procesamiento
-      document.getElementById('processing-indicator').classList.remove('d-none');
-  
-      const reader = new FileReader();
-  
-      reader.onload = function (event) {
-        const fileContent = event.target.result;
-  
-        // Si el archivo es un JSON, puedes parsearlo y utilizar los datos
-        try {
-          const data = JSON.parse(fileContent);
-          dataJson.tarjetas = data.tarjetas;
-          dataJson.conceptos = data.conceptos;
-          movimientos = data.movimientos;
-          simulaciones = data.simulaciones;
-  
-          console.log('Datos cargados:', JSON.stringify(data, null, 2));
-  
-          // Aquí puedes integrar los datos cargados a tu aplicación
-          // Por ejemplo: actualizar el estado de la aplicación con los datos cargados
-        } catch (e) {
-          console.error('Error al analizar el archivo JSON:', e);
-        } finally {
-          // Ocultar el spinner de procesamiento
-          document.getElementById('processing-indicator').classList.add('d-none');
-        }
-      };
-  
-      reader.readAsText(file);
+// Manejar el cambio en el input de archivo
+document.getElementById('backup-file-input').addEventListener('change', function () {
+  const file = this.files[0];
+
+  if (file) {
+    // Mostrar el mensaje de confirmación solo después de que se ha seleccionado el archivo
+    const confirmarReemplazo = confirm("¿Estás seguro de que deseas reemplazar la información actual con los datos del archivo? Esta acción no se puede deshacer.");
+
+    if (!confirmarReemplazo) {
+      console.log("El usuario canceló la carga del archivo.");
+      return; // Salir si el usuario cancela la operación
     }
-  });
+
+    // Mostrar el spinner de procesamiento
+    const processingIndicator = document.getElementById('processing-indicator');
+    processingIndicator.classList.remove('d-none');
+
+    const reader = new FileReader();
+
+    // Manejar el evento onload cuando se termine de leer el archivo
+    reader.onload = function (event) {
+      const fileContent = event.target.result;
+
+      // Si el archivo es un JSON, parsearlo y asignarlo a las variables correspondientes
+      try {
+        const data = JSON.parse(fileContent); // Parsear el contenido del archivo JSON
+        console.log('Contenido del archivo cargado:', data);
+
+        // Asignar los datos a las variables correspondientes
+        tarjetas = data.tarjetas || [];
+        conceptos = data.conceptos || [];
+        movimientos = data.movimientos || [];
+        presupuestos = data.presupuestos || [];
+        // Otros datos que se deseen cargar del archivo pueden ser añadidos aquí
+
+        console.log('Datos cargados:', JSON.stringify({ tarjetas, movimientos }, null, 2));
+
+        // Guardar el estado actualizado en el localStorage o donde se necesite
+        guardarEstado();
+      } catch (e) {
+        console.error('Error al analizar el archivo JSON:', e);
+        alert('El archivo proporcionado no es un JSON válido. Por favor, verifica el archivo.');
+      } finally {
+        // Ocultar el spinner de procesamiento
+        processingIndicator.classList.add('d-none');
+      }
+    };
+
+    // Manejar errores al leer el archivo
+    reader.onerror = function () {
+      console.error('Error al leer el archivo');
+      alert('Ocurrió un error al leer el archivo. Por favor, inténtalo de nuevo.');
+      // Ocultar el spinner en caso de error
+      processingIndicator.classList.add('d-none');
+    };
+
+    // Iniciar la lectura del archivo como texto
+    reader.readAsText(file);
+  }
+});
+
   
 
 

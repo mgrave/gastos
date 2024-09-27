@@ -12,7 +12,7 @@ function agregarMovimiento() {
   const dia = String(fechaLocalOffset.getDate()).padStart(2, '0');
   let fechaActual = `${año}-${mes}-${dia}`;
 
-  let tarjetas = dataJson.tarjetas;
+  //let tarjetas = dataJson.tarjetas; //ORIG
   const monto = parseFloat(document.getElementById("monto").value); // Convertir monto a número
   const cuotas = parseInt(document.getElementById("cuotas-selector").value) || 1; // Obtener el valor de cuotas, por defecto 1
   const montoPorCuota = parseFloat(monto / cuotas).toFixed(2); // Monto dividido entre cuotas (o total si es 1)

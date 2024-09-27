@@ -36,7 +36,7 @@ function loadOpciones() {
   blankOption.textContent = 'Seleccione una tarjeta';
   transferenciaSelector.appendChild(blankOption);
   
-  let tarjetas = dataJson.tarjetas;
+  //let tarjetas = dataJson.tarjetas; //ORIG
   tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
   let tarjetaOrigen = tarjetasActivas.find(tarjeta => tarjeta.cardId === tarjetaPivot);
 
@@ -155,7 +155,7 @@ function cambiarMovimiento() {
 // Función para cambiar tarjeta
 function cambiarTarjeta() {
   // Obtener la lista de tarjetas activas
-  let tarjetas = dataJson.tarjetas;
+  //let tarjetas = dataJson.tarjetas; //ORIG
   tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
   // Encontrar el índice de la tarjeta activa actual
   const indexActual = tarjetasActivas.findIndex(tarjeta => tarjeta.cardId === tarjetaPivot);  

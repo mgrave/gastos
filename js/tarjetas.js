@@ -4,7 +4,8 @@ document
   .querySelector("#tarjetas-menu")
   .addEventListener("click", function () {
     $("#tarjetasModal").modal("show");
-    tarjetas = dataJson.tarjetas;    
+
+    //tarjetas = dataJson.tarjetas;    //ORIG
     //console.log("Listando tarjetas... " + JSON.stringify(dataJson.tarjetas, null, 2));
     renderTarjetas(); // Renderizar las tarjetas al cargar el DOM
   });
@@ -35,7 +36,7 @@ document
       nueva: true // Marca de que es una tarjeta nueva
     };
     tarjetas.unshift(nuevaTarjeta); // Agregar la nueva tarjeta al inicio del array
-    dataJson.tarjetas = tarjetas; // Sincroniza el array principal
+    //dataJson.tarjetas = tarjetas; // Sincroniza el array principal ORIG
     lastOpenedCardId = nuevaTarjeta.cardId; // Abrir el acordeón de la nueva tarjeta
     isNewCard = true;
     renderTarjetas();
@@ -45,7 +46,7 @@ document
   function eliminarTarjeta(cardId) {
     // Filtrar las tarjetas para eliminar la tarjeta con el cardId especificado
     tarjetas = tarjetas.filter(t => t.cardId !== cardId);
-    dataJson.tarjetas = tarjetas;
+    //dataJson.tarjetas = tarjetas; //ORIG
     
     // Filtrar los movimientos asociados a la tarjeta con el cardId especificado
     let movimientosCardId = movimientos.filter(movimiento => parseInt(movimiento.tarjeta) === parseInt(cardId));  
@@ -78,7 +79,7 @@ document
     //tarjetaPivot = tarjetas[1].cardId
     cambiarTarjeta();
 	
-	alert("Se eliminó la tarjeta " + nombre.value + " con exito.");
+	alert("Se eliminó la tarjeta con exito.");
     
   }
   
@@ -141,7 +142,7 @@ function guardarTarjeta(cardId) {
       pagoInput.classList.remove('is-invalid');
     }
 
-    dataJson.tarjetas = tarjetas;
+    //dataJson.tarjetas = tarjetas; //ORIG
     guardarEstado();
     renderTarjetas();    
     alert("Se guardo la tarjeta " + nombre.value + " con exito.");
@@ -167,6 +168,9 @@ function renderTarjetas() {
       </option>
     `).join('');
 
+    // Formatear el balance a dos decimales
+    const balanceFormatted = parseFloat(tarjeta.balance).toFixed(2);
+
     const tarjetaHtml = `
       <div class="accordion" id="tarjetaAccordion-${cardId}">
         <div class="card">
@@ -181,7 +185,7 @@ function renderTarjetas() {
 
 		  <!-- Mostrar el balance a la derecha con "S/." en lugar del guion -->
 		  <div class="d-flex align-items-center">
-			<span class="text-white me-2">S/. ${tarjeta.balance}</span>
+			<span class="text-white me-2">S/. ${balanceFormatted}</span>
 			<i class="fas fa-chevron-down text-white"></i>
 		  </div>
 		</div>

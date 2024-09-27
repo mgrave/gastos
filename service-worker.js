@@ -1,4 +1,4 @@
-const cacheName = 'many';
+const cacheName = 'manyCache';
 const assetsToCache = [
   '/',
   '/index.html',

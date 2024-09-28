@@ -95,6 +95,7 @@ function guardarTarjeta(cardId) {
     tarjeta.color = document.getElementById(`color-${cardId}`).value || 'black';
     tarjeta.balance = parseFloat(document.getElementById(`balance-${cardId}`).value) || 0; // Evitar NaN
     tarjeta.activo = document.getElementById(`activo-${cardId}`).checked; // Guardar estado de activo/inactivo
+    tarjeta.color = "black"; // Si es nueva, ahora es tarjeta guardada
     tarjeta.nueva = false; // Si es nueva, ahora es tarjeta guardada
     isNewCard = false;
     
@@ -102,7 +103,7 @@ function guardarTarjeta(cardId) {
       nombre.classList.add('is-invalid');
       return;
     }else{
-      tarjeta.nombre = nombre.value.toUpperCase();;
+      tarjeta.nombre = nombre.value.toUpperCase();
       nombre.classList.remove('is-invalid');
     }
 
@@ -132,7 +133,7 @@ function guardarTarjeta(cardId) {
       }
 
       if (hasError) {
-        alert("Para tarjetas de crédito, las fechas de facturación y pago son obligatorias.");
+        //alert("Para tarjetas de crédito, las fechas de facturación y pago son obligatorias.");
         return; // Detener la ejecución si no se han ingresado las fechas obligatorias
       }
     } else {
@@ -180,7 +181,7 @@ function renderTarjetas() {
 			 aria-expanded="${isExpanded}" aria-controls="collapse-${cardId}" data-bs-parent="#tarjetas-lista">
 		  
 		  <h5 class="mb-0 text-uppercase text-white" style="text-decoration: none;">
-			<i class="${iconoTipoTarjeta}"></i> ${tarjeta.nombre || 'NOMBRE TARJETA'} ${nuevaTarjetaTexto}
+			<i class="${iconoTipoTarjeta}"></i> ${tarjeta.nombre || nuevaTarjetaTexto}
 		  </h5>
 
 		  <!-- Mostrar el balance a la derecha con "S/." en lugar del guion -->

@@ -5,7 +5,7 @@ var dataJson = {
     { "cardId": 3, "nombre": "Master", "tipo": "credito", "color": "blue", "factura": 16, "pago": 30, "control": 700, "parcial": 500, "balance": 2500, "activo": true },
     { "cardId": 4, "nombre": "BCP", "tipo": "debito", "color": "hotpink", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
     { "cardId": 5, "nombre": "Prestamo", "tipo": "debito", "color": "blue", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },*/
-    { "cardId": 6, "nombre": "Demo", "tipo": "debito", "color": "blue", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 0, "activo": true }
+    { "cardId": 6, "nombre": "Demo", "tipo": "debito", "color": "black", "factura": 16, "pago": 10, "control": 0, "parcial": 0, "balance": 0, "activo": true }
   ],
   "conceptos": [
     { "conceptId": 1, "nombre": "Pago", "tipo_movimiento": "ingreso", "color": "green", "activo": true },
@@ -13,6 +13,11 @@ var dataJson = {
     { "conceptId": 3, "nombre": "Basico", "tipo_movimiento": "egreso", "color": "blue", "activo": true },
     { "conceptId": 4, "nombre": "Gusto", "tipo_movimiento": "egreso", "color": "red", "activo": true },
     { "conceptId": 5, "nombre": "Ahorro", "tipo_movimiento": "egreso", "color": "gray", "activo": true }
+  ],
+  "presupuestos" : [
+    {
+      "movId": 0, "tarjeta": "", "monto": "200.00", "detalle": "LUZ", "fecha": "09", "autopago": false, "tipo": "egreso", "concepto": 4, "pptoId": 1, "activo": true
+    }
   ]
 }
 
@@ -53,6 +58,10 @@ if(tarjetas.length == 0){
 
 if(conceptos.length == 0){
   conceptos = dataJson.conceptos;
+}
+
+if(presupuestos.length == 0){
+  presupuestos = dataJson.presupuestos;
 }
 
 let tipoMovimientoActivos = dataConf.tipoMovimiento.filter(

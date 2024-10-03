@@ -3,21 +3,51 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="msapplication-starturl" content="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">  
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
   <title>Many</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">	
-  <link rel="stylesheet" href="./css/styles.css" />  
-  <link rel="manifest" href="./manifest.json">
+  <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+  <link rel="stylesheet" href="./css/styles.css" />
+  <!--<link rel="manifest" href="./manifest.json">-->
   <meta name="theme-color" content="#ffffff">
+
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <meta name="google-signin-client_id"
+    content="345">
+
+  <script>
+    function onSignIn(googleUser) {
+      var profile = googleUser.getBasicProfile();
+      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+      var id_token = googleUser.getAuthResponse().id_token;
+      console.log(id_token);
+    }
+
+
+    function signOut() {
+      var auth2 = gapi.auth2.getAuthInstance();
+      auth2.signOut().then(function () {
+        console.log('User signed out.');
+      });
+    }
+
+  </script>
 </head>
 
 <body class="bg-light">
+
+  <!--<div class="g-signin2" data-onsuccess="onSignIn"></div>
+  <a href="#" onclick="signOut();">Sign out</a>-->
+
+
   <!-- Barra de título con hamburguesa -->
   <nav class="navbar navbar-dark bg-dark">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarOptions"
@@ -36,7 +66,7 @@
         <li class="nav-item" id="cargar_backup">
           <a class="nav-link" href="#">Cargar Backup</a>
           <input type="file" id="backup-file-input" style="display: none;" />
-        </li>        
+        </li>
         <li class="nav-item" id="descargar_backup">
           <a class="nav-link" href="#">Descargar Backup</a>
         </li>
@@ -47,7 +77,28 @@
         <li class="nav-item"><a class="nav-link" href="#">Monedas</a></li>
       </ul>
     </div>
+
+    <!-- Desplegable para iniciar y cerrar sesión -->
+    <div class="dropdown ms-auto">
+      <button class="btn btn-outline-light dropdown-toggle" type="button" id="dropdownMenuButton"
+        data-bs-toggle="dropdown" aria-expanded="false">
+        <span id="user-name">Cuenta</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+        <li>
+          <div class="g-signin2" data-onsuccess="onSignIn"></div>
+        </li>
+        <li>
+          <button class="dropdown-item" id="signout-button" onclick="signOut()" style="display: none;">Cerrar
+            sesión</button>
+        </li>
+      </ul>
+    </div>
+
+
   </nav>
+
+
 
   <!-- Botones debajo de la barra de título -->
   <div class="container mt-2">
@@ -63,7 +114,7 @@
       </button>
     </div>
   </div>
-  
+
   <!-- Tabla de Movimientos -->
   <div class="container mt-2">
     <div class="table-container">
@@ -82,9 +133,10 @@
   <div class="footer">
     <div class="container">
       <div class="d-flex align-items-center">
-        <input type="text" id="detalle" class="form-control border-0 bg-transparent" placeholder="Ingresa tu detalle" style="flex: 1; max-width: none; padding-left: 0px;" />
+        <input type="text" id="detalle" class="form-control border-0 bg-transparent" placeholder="Ingresa tu detalle"
+          style="flex: 1; max-width: none; padding-left: 0px;" />
         <h5 class="ml-auto mb-0 d-flex align-items-center">
-          <span id="tipoTarjeta" class="tipo-tarjeta">Balance</span> 
+          <span id="tipoTarjeta" class="tipo-tarjeta">Balance</span>
           <span id="balance" class="balance-positive btn btn-sm" style="width: auto; padding-left: 1rem;">0.00</span>
         </h5>
       </div>
@@ -106,7 +158,8 @@
   </div>
 
   <!-- Modal para seleccionar fecha, cuotas y transferencia -->
-  <div class="modal fade" id="opcionesModal" tabindex="-1" role="dialog" aria-labelledby="opcionesModalLabel" aria-hidden="true">
+  <div class="modal fade" id="opcionesModal" tabindex="-1" role="dialog" aria-labelledby="opcionesModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -138,14 +191,15 @@
           </button>
           <button type="button" class="btn btn-primary" onclick="guardarOpciones()">
             Guardar
-          </button>          
+          </button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Modal para gestionar tarjetas -->
-  <div class="modal fade" id="tarjetasModal" tabindex="-1" role="dialog" aria-labelledby="tarjetasModalLabel" aria-hidden="true">
+  <div class="modal fade" id="tarjetasModal" tabindex="-1" role="dialog" aria-labelledby="tarjetasModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -164,31 +218,30 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Cerrar
-          </button>
+          <!--<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">X</button>-->
         </div>
       </div>
     </div>
   </div>
 
   <!-- Modal para gestionar estimados -->
-  <div class="modal fade" id="estimadosModal" tabindex="-1" role="dialog" aria-labelledby="estimadosModalLabel" aria-hidden="true">
+  <div class="modal fade" id="estimadosModal" tabindex="-1" role="dialog" aria-labelledby="estimadosModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="estimadosModalLabel">Estimados</h5>
+          <h5 class="modal-title" id="estimadosModalLabel">Presupuestos</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
           <!-- Botón para agregar una nueva simulación -->
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <button type="button" class="btn btn-success" id="agregar-estimado-btn">
+            <button type="button" class="btn btn-success" id="agregar-presupuesto-btn">
               Agregar estimado
             </button>
           </div>
 
-          
+
 
           <!-- Contenedor para el acordeón de estimados -->
           <div id="estimados-lista">
@@ -198,22 +251,23 @@
         <div class="modal-footer d-flex justify-content-between">
           <h5 class="mb-0 text-bold">Total: S/. <span id="total-estimado" class="text-bold">0.00</span></h5>
           <div>
-            <button type="button" class="btn btn-primary" id="pagar-todo-btn">Pagar todo</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            <button type="button" class="btn btn-primary" id="restaurar-todo-btn">Reset</button>
+            <button type="button" class="btn btn-primary" id="pagar-todo-btn">Pagar</button>
+            <!--<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">X</button>-->
           </div>
         </div>
-        
+
       </div>
     </div>
   </div>
 
   <!-- Spinner de Bootstrap para mostrar mientras se procesa el archivo -->
-<div id="processing-indicator" class="d-none">
-  <div class="spinner-border text-primary" role="status">
-    <span class="visually-hidden">Cargando...</span>
+  <div id="processing-indicator" class="d-none">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p>Procesando...</p>
   </div>
-  <p>Procesando...</p>
-</div>
 
 
 
@@ -222,11 +276,14 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+
   <script src="./js/script.js"></script>
   <script src="./js/opciones.js"></script>
   <script src="./js/tarjetas.js"></script>
-  <script src="./js/movimientos.js"></script>  
+  <script src="./js/movimientos.js"></script>
   <script src="./js/presupuestos.js"></script>
+
 </body>
 
 </html>

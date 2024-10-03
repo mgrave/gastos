@@ -26,22 +26,22 @@ let isNewPpto = false; // Para identificar si una tarjeta es nueva
 
 // Función para generar un nuevo acordeón de simulación
 document
-  .getElementById('agregar-estimado-btn')
+  .getElementById('agregar-presupuesto-btn')
   .addEventListener('click', () => {
-    let idCounterPresupuestos = Math.max(...presupuestos.map(t => t.pptoId)) + 1 || 1;
-    const nuevoId = idCounterPresupuestos++;
-    console.log("NUEVO ID:" + nuevoId)
+    let idCounterPresupuestos = (presupuestos.length > 0)
+      ? Math.max(...presupuestos.map(t => t.pptoId)) + 1
+      : 1;
 
     const nuevoPresupuesto = {
       movId: 0,
       tarjeta: "",
       monto: "",
       detalle: "",
-      fecha: "",
+      dia: "",
       autopago: "", // Agregado el estado de autopago
       tipo: 'egreso', // Puede ajustarse según sea necesario
       concepto: 4, // Por defecto, ajustable
-      pptoId: nuevoId,
+      pptoId: idCounterPresupuestos,
       activo: true,
       nuevo: true
     };
@@ -51,6 +51,104 @@ document
     isNewPpto = true;
     renderPresupuesto();
   });
+
+function renderPresupuesto() {
+  const presupuestoLista = document.getElementById('estimados-lista');
+  presupuestoLista.innerHTML = ''; // Asegúrate de que este contenedor tenga id 'estimados-lista'
+
+  presupuestos.forEach((presupuesto, index) => {
+    const pptoId = presupuesto.pptoId;
+    const isExpanded = pptoId === lastOpenedPptoId; // Solo el acordeón abierto estará expandido
+    const nuevoPptoTexto = presupuesto.nuevo ? ' (Nuevo Ppto)' : '';
+    const tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
+
+    // Generar opciones del combo de tarjetas con un valor vacío por defecto
+    const tarjetasOptions = `
+    <option value="">Seleccione una tarjeta</option>
+    ${tarjetasActivas.map(tarjeta => {      
+      return `
+        <option value="${tarjeta.cardId}" ${parseInt(tarjeta.cardId) === parseInt(presupuesto.tarjeta) ? 'selected' : ''}>
+          ${tarjeta.nombre.toUpperCase()}
+        </option>
+      `;
+    }).join('')}
+  `;
+
+    const balanceFormatted = parseFloat(presupuesto.monto || 0).toFixed(2);
+
+    const acordeonHTML = `
+      <div class="accordion" id="estimadoAccordion-${pptoId}">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center" id="header-estimado-${pptoId}"
+      style="cursor: pointer; background-color: ${presupuesto.pagado ? 'honeydew' : 'cornsilk'};"
+      data-bs-toggle="collapse" data-bs-target="#collapse-${pptoId}" aria-expanded="${isExpanded}"
+      aria-controls="collapse-${pptoId}" data-bs-parent="#estimados-lista">
+
+      <h5 class="mb-0" id="titulo-estimado-${pptoId}">
+        ${presupuesto.detalle || nuevoPptoTexto} [${presupuesto.pagado || "Pendiente"}]
+      </h5>
+
+      <!-- Mostrar el balance a la derecha con "S/." en lugar del guion -->
+      <div class="d-flex align-items-center">
+        <span class="me-2" style="color: black;">S/. ${balanceFormatted}</span>
+        <i class="fas fa-chevron-down" style="color: black;"></i>
+      </div>
+    </div>
+
+
+    <div id="collapse-${pptoId}" class="collapse ${isExpanded ? 'show' : ''}"
+      aria-labelledby="header-estimado-${pptoId}" data-bs-parent="#estimados-lista">
+      <div class="card-body">
+        <form id="estimadoForm-${pptoId}">
+          <div class="form-group">
+            <label for="tarjeta-estimado-${pptoId}">Tarjeta</label>
+            <select class="form-control" id="tarjeta-estimado-${pptoId}">
+              ${tarjetasOptions}
+            </select>
+            <div class="invalid-feedback">La tarjeta es obligatoria.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="monto-estimado-${pptoId}">Monto</label>
+            <input type="number" class="form-control" id="monto-estimado-${pptoId}" value="${presupuesto.monto}" placeholder="Ingrese el monto">
+            <div class="invalid-feedback">El monto es obligatorio.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="detalle-estimado-${pptoId}">Detalle</label>
+            <input type="text" class="form-control" id="detalle-estimado-${pptoId}" value="${presupuesto.detalle}" placeholder="Ingrese el detalle">
+            <div class="invalid-feedback">El detalle es obligatorio.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="dia-estimado-${pptoId}">Fecha de pago</label>
+            <input type="number" class="form-control" id="dia-estimado-${pptoId}" value="${presupuesto.dia}" min="1" max="31" placeholder="Día">
+            <div class="invalid-feedback">La fecha de pago es obligatoria.</div>
+          </div>
+
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="autopago-estimado-${pptoId}" ${presupuesto.autopago ? 'checked' : ''}>
+            <label class="form-check-label" for="autopago-estimado-${pptoId}">Autopago</label>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <div>
+              <button class="btn btn-success" onclick="restaurarPresupuesto(${pptoId})">Reset</button>  
+              <button class="btn btn-success" onclick="pagarPresupuesto(${pptoId})">Pagar</button>  
+              <button class="btn btn-danger" onclick="eliminarEstimado(${pptoId})">Eliminar</button>
+              <button class="btn btn-primary" onclick="guardarPresupuesto(${pptoId})">Guardar</button>              
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+    presupuestoLista.insertAdjacentHTML('beforeend', acordeonHTML);
+  });
+}
 
 // Función para guardar una simulación
 function guardarPresupuesto(pptoId) {
@@ -63,27 +161,28 @@ function guardarPresupuesto(pptoId) {
     const diaInput = document.getElementById(`dia-estimado-${pptoId}`);
     const autoPagoCheckbox = document.getElementById(`autopago-estimado-${pptoId}`);
 
-    completarFechaSimulacion(diaInput.value);
+    //completarFechaSimulacion(diaInput.value);
 
     ppto.tarjeta = tarjetaSelect.value;
     ppto.dia = diaInput.value;
     ppto.monto = montoInput.value;
     ppto.detalle = detalleInput.value.toUpperCase();
+    ppto.autopago = autoPagoCheckbox.checked;
     ppto.nuevo = false; // Si es nueva, ahora es tarjeta guardada
 
     isNewPpto = false;
     let hasError = false;
 
 
-    if (!tarjetaSelect.value) {
+    if (!tarjetaSelect.value || tarjetaSelect.value === '0') {
       tarjetaSelect.classList.add('is-invalid');
-      autoPagoCheckbox.checked = false;
+      //autoPagoCheckbox.checked = false;
       hasError = true;
     } else {
       tarjetaSelect.classList.remove('is-invalid');
     }
 
-    if (!montoInput.value) {
+    if (!montoInput.value || montoInput.value <= 0) {
       montoInput.classList.add('is-invalid');
       hasError = true;
     } else {
@@ -97,9 +196,16 @@ function guardarPresupuesto(pptoId) {
       detalleInput.classList.remove('is-invalid');
     }
 
-    if (autoPagoCheckbox.checked && !diaInput.value) {
+    if (!diaInput.value) {
       diaInput.classList.add('is-invalid');
-      autoPagoCheckbox.checked = false;
+      //autoPagoCheckbox.checked = false;
+      hasError = true;
+    } else {
+      diaInput.classList.remove('is-invalid');
+    }
+
+    if (!diaInput.value || diaInput.value < 1 || diaInput.value > 31) {
+      diaInput.classList.add('is-invalid');
       hasError = true;
     } else {
       diaInput.classList.remove('is-invalid');
@@ -117,116 +223,12 @@ function guardarPresupuesto(pptoId) {
 
     actualizarTotalEstimado();
     guardarEstado();
-    renderPresupuesto()
+    renderPresupuesto();
     alert("Se guardo el presupuesto con exito.");
     // Cerrar el acordeón después de guardar
     //$(`#collapse-${id}`).collapse('hide');
   }
 }
-
-
-function renderPresupuesto() {
-  const presupuestoLista = document.getElementById('estimados-lista');
-  presupuestoLista.innerHTML = ''; // Asegúrate de que este contenedor tenga id 'estimados-lista'
-
-  presupuestos.forEach((presupuesto, index) => {
-    const pptoId = presupuesto.pptoId;
-    const isExpanded = pptoId === lastOpenedPptoId; // Solo el acordeón abierto estará expandido
-    const nuevoPptoTexto = presupuesto.nuevo ? ' (Nuevo Ppto)' : '';
-    const tarjetasActivas = tarjetas.filter(tarjeta => tarjeta.activo);
-
-    // Generar opciones del combo de tarjetas con un valor vacío por defecto
-    const tarjetasOptions = `
-      <option value="">Seleccione una tarjeta</option>
-      ${tarjetasActivas.map(tarjeta => `
-        <option value="${tarjeta.cardId}">${tarjeta.nombre || 'NOMBRE TARJETA'}</option>
-      `).join('')}
-    `;
-
-    const acordeonHTML = `
-      <div class="card mb-3" id="estimado-${pptoId}">
-        <div class="card-header d-flex justify-content-between align-items-center" 
-             id="header-estimado-${pptoId}" 
-             style="cursor: pointer; background-color: ${isPagado(pptoId) ? 'lightgreen' : 'inherit'};"
-             data-bs-toggle="collapse" data-bs-target="#collapse-${pptoId}" 
-             aria-expanded="${isExpanded}" aria-controls="collapse-${pptoId}" data-bs-parent="#estimados-lista">
-          
-          <h5 class="mb-0" id="titulo-estimado-${pptoId}">${presupuesto.detalle || nuevoPptoTexto}</h5>
-          <button class="btn btn-link" aria-expanded="false" aria-controls="collapse-${pptoId}">
-            <i class="fas fa-chevron-down"></i>
-          </button>
-        </div>
-        <div id="collapse-${pptoId}" class="collapse ${isExpanded ? 'show' : ''}" 
-         aria-labelledby="header-estimado-${pptoId}" data-bs-parent="#estimados-lista">
-          <div class="card-body">
-            <div class="form-group">
-              <label for="tarjeta-estimado-${pptoId}">Tarjeta</label>
-              <select class="form-control" id="tarjeta-estimado-${pptoId}">
-                ${tarjetasOptions}
-              </select>
-              <div class="invalid-feedback">La tarjeta es obligatoria.</div>
-            </div>
-            <div class="form-group">
-              <label for="monto-estimado-${pptoId}">Monto</label>
-              <input type="number" class="form-control" id="monto-estimado-${pptoId}" value="${presupuesto.monto}" placeholder="Ingrese el monto">
-              <div class="invalid-feedback">El monto es obligatorio.</div>
-            </div>
-            <div class="form-group">
-              <label for="detalle-estimado-${pptoId}">Detalle</label>
-              <input type="text" class="form-control" id="detalle-estimado-${pptoId}" value="${presupuesto.detalle}" placeholder="Ingrese el detalle">
-              <div class="invalid-feedback">El detalle es obligatorio.</div>
-            </div>
-            <div class="form-group">
-              <label for="dia-estimado-${pptoId}">Fecha de pago</label>
-              <input type="number" class="form-control" id="dia-estimado-${pptoId}" value="${presupuesto.dia}" min="1" max="31" placeholder="Día">
-              <div class="invalid-feedback">La fecha de pago es obligatoria.</div>
-            </div>
-            <div class="form-group form-check">
-              <input type="checkbox" class="form-check-input" id="autopago-estimado-${pptoId}">
-              <label class="form-check-label" for="autopago-estimado-${pptoId}">Autopago</label>
-            </div>
-            <button class="btn btn-success" onclick="guardarPresupuesto(${pptoId})">Guardar</button>
-            <button class="btn btn-danger" onclick="eliminarEstimado(${pptoId})">Eliminar</button>
-            <button class="btn btn-primary" onclick="pagarEstimado(${pptoId})">Pagar</button>          
-          </div>
-        </div>
-      </div>`;
-
-    presupuestoLista.insertAdjacentHTML('beforeend', acordeonHTML);
-  });
-}
-
-
-
-
-// Desplegar el acordeón recién creado
-//$(`#collapse-${nuevoId}`).collapse('show');
-
-// Elementos para validar
-
-
-
-
-
-
-function validarCamposYAutopago(nuevoId) {
-
-
-}
-
-
-
-// Función para verificar si el estimado ha sido pagado (esto es un ejemplo, implementa según tu lógica)
-function isPagado(id) {
-  // Aquí implementa la lógica para determinar si el estimado ha sido pagado
-  // Por ejemplo, puedes usar un array de IDs pagados o una propiedad en los datos
-  return false; // Cambia esto por tu lógica real
-}
-
-
-
-
-
 
 // Función para eliminar una simulación
 function eliminarEstimado(pptoId) {
@@ -245,65 +247,59 @@ function eliminarEstimado(pptoId) {
   guardarEstado();
 }
 
-// Función para cancelar la creación de una simulación (solo si es nueva)
-/*function cancelarEstimado(id) {
-  const simulacionExiste = simulaciones.find(sim => sim.movId === id);
 
-  if (!simulacionExiste) {
-    eliminarEstimado(id); // Si es nueva, simplemente se elimina
-  } else {
-    // Si ya estaba guardada, se colapsa el acordeón
-    $(`#collapse-${id}`).collapse('hide');
-  }
-}*/
 
 // Función para generar un movimiento de pago para un estimado
-function pagarEstimado(id) {
-  const presupuesto = presupuestos.find(sim => sim.pptoId === id);
+function pagarPresupuesto(pptoId) {
+  const presupuesto = presupuestos.find(sim => sim.pptoId === pptoId);
   if (presupuesto) {
+
+    let idCounterMov = (movimientos.length > 0)
+    ? Math.max(...movimientos.map(t => t.movId)) + 1
+    : 1;
+
+    const fechaActual = obtenerFechaSimulacion(presupuesto.dia); 
+
     const movimientoPago = {
-      fecha: new Date().toISOString().split('T')[0],
+      movId: idCounterMov,
+      fecha: fechaActual,
       tipo: presupuesto.tipo,
-      monto: presupuesto.monto,
+      monto: parseInt(presupuesto.monto),
       concepto: presupuesto.concepto,
-      tarjeta: presupuesto.tarjeta,
-      detalle: presupuesto.detalle
+      tarjeta: parseInt(presupuesto.tarjeta),
+      detalle: presupuesto.detalle,
+      pptoId: presupuesto.pptoId
     };
 
-    // Aquí puedes agregar tu lógica para registrar el movimiento de pago
-    console.log(`Pago registrado para el estimado ${id}:`, movimientoPago);
+    presupuesto.pagado = fechaActual;
+    movimientos.push(movimientoPago);
 
-    alert(`Pago realizado para: ${presupuesto.detalle} - S/.${presupuesto.monto}`);
-  } else {
-    alert("Estimado no encontrado para realizar el pago.");
-  }
+    actualizarMovimientos();
+    
+    console.log(`Pago registrado para el estimado ${pptoId}:`, movimientoPago);
+
+    //alert(`Pago realizado para: ${presupuesto.detalle} - S/.${presupuesto.monto}`);
+  } 
 }
 
 // Función para pagar todos los estimados
-function pagarTodosEstimados() {
-  presupuestos.forEach(presupuesto => {
-    const movimientoPago = {
-      fecha: new Date().toISOString().split('T')[0],
-      tipo: presupuesto.tipo,
-      monto: presupuesto.monto,
-      concepto: presupuesto.concepto,
-      tarjeta: presupuesto.tarjeta,
-      detalle: presupuesto.detalle
-    };
-
-    // Lógica para registrar el movimiento de pago de cada estimado
-    console.log(`Pago registrado para el estimado ${presupuesto.pptoId}:`, movimientoPago);
+document.querySelector("#pagar-todo-btn").addEventListener("click", function () {
+  totalPresupuesto = 0;
+  presupuestos.forEach(presupuesto => {   
+    if (!presupuesto.autopago) {
+      pagarPresupuesto(presupuesto.pptoId);
+      totalPresupuesto += parseFloat(presupuesto.monto);
+    }    
   });
 
   alert(`Se realizaron pagos por un total de S/.${totalPresupuesto.toFixed(2)}`);
-}
 
+});
 // Función para actualizar la suma total de estimados
 function actualizarTotalEstimado() {
   totalPresupuesto = presupuestos.reduce((total, presupuesto) => total + parseFloat(presupuesto.monto), 0);
   document.getElementById('total-estimado').textContent = totalPresupuesto.toFixed(2);
 }
-
 
 // Función para obtener la fecha actual en formato año-mes-día
 function obtenerFechaActual() {
@@ -315,44 +311,43 @@ function obtenerFechaActual() {
 }
 
 // Función para completar la fecha de la simulación usando el mes y año actual
-function completarFechaSimulacion(dia) {
+function obtenerFechaSimulacion(dia) {
   const hoy = new Date();
   const año = hoy.getFullYear();
   const mes = (hoy.getMonth() + 1).toString().padStart(2, '0');
   return `${año}-${mes}-${dia.toString().padStart(2, '0')}`;
 }
 
-
-
 // Función que ejecuta el autopago para las simulaciones pendientes
 function ejecutarAutopago() {
   presupuestos.forEach(presupuesto => {
     // Solo considerar simulaciones que tienen autopago activado
-    if (presupuesto.autopago) {
+    
+    if (presupuesto.autopago && !presupuesto.pagado) {         
       const fechaActual = obtenerFechaActual(); // Obtener la fecha actual para las comparaciones
-      const fechaSimulacion = completarFechaSimulacion(presupuesto.dia); // Completar la fecha de la simulación
-
-      // Si la fecha de la simulación es anterior o igual a la fecha actual
-      if (fechaSimulacion <= fechaActual) {
-        // Crear un nuevo movimiento para registrar el pago automático
-        const movimientoPago = {
-          fecha: fechaSimulacion,
-          tipo: presupuesto.tipo,
-          monto: presupuesto.monto,
-          tarjeta: presupuesto.tarjeta,
-          concepto: presupuesto.concepto,
-          detalle: presupuesto.detalle
-        };
-
-        // Agregar el movimiento al array de movimientos
-        movimientos.push(movimientoPago);
-        console.log(`Pago automático realizado para la simulación ${presupuesto.pptoId}:`, movimientoPago);
+      const fechaSimulacion = obtenerFechaSimulacion(presupuesto.dia); // Completar la fecha de la simulación
+      // Si la fecha de la simulación es anterior o igual a la fecha actual      
+      if (fechaSimulacion <= fechaActual) {        
+        pagarPresupuesto(presupuesto.pptoId);
       }
     }
   });
 
   console.log("Pagos automáticos ejecutados:", movimientos);
 }
+
+function restaurarPresupuesto(pptoId) {
+  const ppto = presupuestos.find(sim => sim.pptoId === pptoId);  
+  ppto.pagado = "";
+  guardarEstado();
+}
+
+
+document.querySelector("#restaurar-todo-btn").addEventListener("click", function () {  
+  presupuestos.forEach(presupuesto => {       
+    restaurarPresupuesto(presupuesto.pptoId);
+  });
+});
 
 // Función para programar la ejecución diaria
 function programarAutopago(horaObjetivo) {

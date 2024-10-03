@@ -1,3 +1,9 @@
+//TODO
+//en fechas no se debe exceder el 31
+//confirmar antes de guardarar/eliminmar  
+//eliminacion logica 
+//banner en nombres largos en el titulo
+
 var dataJson = {
   "tarjetas": [
     /*{ "cardId": 1, "nombre": "Visa", "tipo": "credito", "color": "black", "factura": 12, "pago": 10, "control": 0, "parcial": 0, "balance": 2500, "activo": true },
@@ -16,7 +22,7 @@ var dataJson = {
   ],
   "presupuestos" : [
     {
-      "movId": 0, "tarjeta": "", "monto": "200.00", "detalle": "LUZ", "fecha": "09", "autopago": false, "tipo": "egreso", "concepto": 4, "pptoId": 1, "activo": true
+      "movId": 0, "tarjeta": "6", "monto": "200.00", "detalle": "LUZ", "dia": "9", "autopago": false, "tipo": "egreso", "concepto": 4, "pptoId": 1, "activo": true
     }
   ]
 }
@@ -30,7 +36,7 @@ const dataConf = {
     { "tipo": "pago", "class": "pago", "alias": "Fecha de pago", "activo": false }
   ]
 };
-
+/*
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('./service-worker.js').then(function(registration) {
@@ -40,8 +46,7 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
-
-
+*/
 
 let tarjetaPivot = 0;
 let movimientoPivot = 0;
@@ -338,14 +343,36 @@ document.getElementById('backup-file-input').addEventListener('change', function
 });
 
   
+function onSignIn(googleUser) {
+  var profile = googleUser.getBasicProfile();
+  updateUIForUser(profile);
+  console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+  console.log('Name: ' + profile.getName());
+  console.log('Image URL: ' + profile.getImageUrl());
+  console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+  
+}
+
+
+
+
+
+function signOut() {
+  var auth2 = gapi.auth2.getAuthInstance();
+  auth2.signOut().then(function () {
+    updateUIForSignOut()
+    console.log('User signed out.');
+  });
+}
 
 
 // Agregar esto al final del script, justo antes de cerrar la etiqueta
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {  
   cargarEstado();
   cancelarOpciones();
   cambiarMovimiento();
   cambiarTarjeta();
+  ejecutarAutopago();
   guardarEstado(); // Guardar el estado después de inicializar la página
 });
 

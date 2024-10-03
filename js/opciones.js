@@ -27,7 +27,6 @@ document.getElementById("transferencia-selector").addEventListener("change", fun
 
 // Llenar el selector de tarjetas en el modal
 function loadOpciones() {
-  console.log("Llenar Selector Transferencia ejecutado");
   const transferenciaSelector = document.getElementById('transferencia-selector');
   transferenciaSelector.innerHTML = ''; // Limpiar opciones anteriores
   
@@ -97,12 +96,11 @@ function cancelarOpciones() {
   const mes = String(fechaLocalOffset.getMonth() + 1).padStart(2, '0');
   const dia = String(fechaLocalOffset.getDate()).padStart(2, '0');
   fechaSeleccionada = `${año}-${mes}-${dia}`;
-  console.log("cancelarOpciones fecha "+fechaSeleccionada);
 
   document.getElementById("fecha-selector").value = fechaSeleccionada; // Restauramos fecha
   document.getElementById("cuotas-selector").value = 1; // Restauramos cuotas
   document.getElementById("transferencia-selector").value = "";  // Restauramos transferencia
-  document.getElementById("opciones").style.color = ""; // Restaurar color del boton
+  document.getElementById("opciones").style.color = "";
   transferencia = "";
   
   formularioModificado = false;
@@ -115,10 +113,10 @@ function actualizarOpciones() {
   document.getElementById("opciones");
 	
   if (fechaSeleccionada !== fechaActual || cuotasSelector.value !== "1" || transferencia.value !== "") {
-	  iconoFecha.style.color = "red";
+	  document.getElementById("opciones").style.color = "red";
     formularioModificado = true;
   }else{
-	  iconoFecha.style.color = ""; // Restaurar color por defecto
+	  document.getElementById("opciones").style.color = "";
 	  transferencia = "";
 	  formularioModificado = false;
   }

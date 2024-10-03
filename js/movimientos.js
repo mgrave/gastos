@@ -29,12 +29,16 @@ function agregarMovimiento() {
     const tarjetaOrigen = tarjetasActivas.find(tarjeta1 => tarjeta1.cardId === parseInt(tarjetaPivot));
     const tarjetaDestino = tarjetasActivas.find(tarjeta2 => tarjeta2.cardId === parseInt(tarjetaTransferencia.value));
 
+    let idCounterMov = (movimientos.length > 0)
+    ? Math.max(...movimientos.map(t => t.movId)) + 1
+    : 1;
+
     // Iterar por cada cuota y generar un movimiento para cada una
     for (let i = 0; i < cuotas; i++) {
       const fechaMovimiento = new Date(fechaCuota);
       fechaMovimiento.setMonth(fechaCuota.getMonth() + i); // Aumentar la fecha en meses según la cuota
       const nuevoMovimiento = {
-        movId: idCounter++, // Incrementar el identificador único
+        movId: idCounterMov, // Incrementar el identificador único
         fecha: fechaMovimiento.toISOString().split('T')[0], // Formato de fecha en YYYY-MM-DD
         tipo: tipoMovimientoActivos[movimientoPivot].tipo, // Tipo de movimiento actual
         monto: parseFloat(montoPorCuota), // Monto numérico

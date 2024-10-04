@@ -1,4 +1,4 @@
-//TODO: agregar combo de tipo tarjeta, agregar control de colores, cambiar contreoles friendly movil
+//TODO: awcombo de tipo tarjeta, agregar control de colores, cambiar contreoles friendly movil
 // Agrega evento click al menú de lista
 document
   .querySelector("#tarjetas-menu")
@@ -248,8 +248,8 @@ function renderTarjetas() {
 
                   <!-- Botones -->
                   <div>
-                    <button type="button" class="btn btn-danger" onclick="eliminarTarjeta(${cardId})">Eliminar</button>
-                    <button type="button" class="btn btn-primary" onclick="guardarTarjeta(${cardId})">Guardar</button>
+                    <button type="button" class="btn btn-danger" onclick="eliminarTarjeta(${cardId})"><i class="fa-solid fa-trash-can"></i></button>
+                    <button type="button" class="btn btn-success" onclick="guardarTarjeta(${cardId})"><i class="fa-solid fa-floppy-disk"></i></button>
                   </div>
                 </div>
               </form>

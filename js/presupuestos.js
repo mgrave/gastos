@@ -126,17 +126,17 @@ function renderPresupuesto() {
             <div class="invalid-feedback">La fecha de pago es obligatoria.</div>
           </div>
 
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" role="switch" id="autopago-estimado-${pptoId}" ${presupuesto.autopago ? 'checked' : ''}>
-            <label class="form-check-label" for="autopago-estimado-${pptoId}">Autopago</label>
-          </div>
-
           <div class="d-flex justify-content-between align-items-center mt-2">
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" role="switch" id="autopago-estimado-${pptoId}" ${presupuesto.autopago ? 'checked' : ''}>
+              <label class="form-check-label" for="autopago-estimado-${pptoId}">Autopago</label>
+            </div>
+
             <div>
-              <button class="btn btn-success" onclick="restaurarPresupuesto(${pptoId})">Reset</button>  
-              <button class="btn btn-success" onclick="pagarPresupuesto(${pptoId})">Pagar</button>  
-              <button class="btn btn-danger" onclick="eliminarEstimado(${pptoId})">Eliminar</button>
-              <button class="btn btn-primary" onclick="guardarPresupuesto(${pptoId})">Guardar</button>              
+              <button class="btn btn-secondary" id="restaurar-presupuesto-${pptoId}" onclick="restaurarPresupuesto(${pptoId})" style="display: ${presupuesto.detalle && presupuesto.pagado ? 'inline-block' : 'none'};"><i class="fa-solid fa-clock-rotate-left"></i></button>  
+              <button class="btn btn-primary" id="pagar-presupuesto-${pptoId}" onclick="pagarPresupuesto(${pptoId})" style="display: ${presupuesto.detalle && !presupuesto.pagado ? 'inline-block' : 'none'};"><i class="fa-solid fa-credit-card"></i></i></button>  
+              <button class="btn btn-danger"  onclick="eliminarEstimado(${pptoId})"><i class="fa-solid fa-trash-can"></i></button>
+              <button class="btn btn-success" onclick="guardarPresupuesto(${pptoId})"><i class="fa-solid fa-floppy-disk"></i></button>              
             </div>
           </div>
         </form>
@@ -275,24 +275,38 @@ function pagarPresupuesto(pptoId) {
     movimientos.push(movimientoPago);
 
     actualizarMovimientos();
-    
+        
+    refrescarAcordeon(presupuesto);
+
     console.log(`Pago registrado para el estimado ${pptoId}:`, movimientoPago);
 
     //alert(`Pago realizado para: ${presupuesto.detalle} - S/.${presupuesto.monto}`);
   } 
 }
 
+
+document.querySelector("#restaurar-pptos-btn").addEventListener("click", function () {  
+  presupuestos.forEach(presupuesto => {       
+    restaurarPresupuesto(presupuesto.pptoId);
+  });
+});
+
 // Función para pagar todos los estimados
-document.querySelector("#pagar-todo-btn").addEventListener("click", function () {
+document.querySelector("#pagar-pptos-btn").addEventListener("click", function () {
   totalPresupuesto = 0;
   presupuestos.forEach(presupuesto => {   
-    if (!presupuesto.autopago) {
+    if (!presupuesto.autopago && !presupuesto.pagado) {
       pagarPresupuesto(presupuesto.pptoId);
       totalPresupuesto += parseFloat(presupuesto.monto);
     }    
   });
 
-  alert(`Se realizaron pagos por un total de S/.${totalPresupuesto.toFixed(2)}`);
+  if(totalPresupuesto === 0){
+    alert("No hay presupuestos por pagar.");
+    return;
+  }else{
+    alert(`Se realizaron pagos por un total de S/.${totalPresupuesto.toFixed(2)}`);
+  }
 
 });
 // Función para actualizar la suma total de estimados
@@ -321,8 +335,8 @@ function obtenerFechaSimulacion(dia) {
 // Función que ejecuta el autopago para las simulaciones pendientes
 function ejecutarAutopago() {
   presupuestos.forEach(presupuesto => {
-    // Solo considerar simulaciones que tienen autopago activado
     
+    // Solo considerar simulaciones que tienen autopago activado    
     if (presupuesto.autopago && !presupuesto.pagado) {         
       const fechaActual = obtenerFechaActual(); // Obtener la fecha actual para las comparaciones
       const fechaSimulacion = obtenerFechaSimulacion(presupuesto.dia); // Completar la fecha de la simulación
@@ -337,17 +351,27 @@ function ejecutarAutopago() {
 }
 
 function restaurarPresupuesto(pptoId) {
-  const ppto = presupuestos.find(sim => sim.pptoId === pptoId);  
-  ppto.pagado = "";
+  const presupuesto = presupuestos.find(sim => sim.pptoId === pptoId);  
+  presupuesto.pagado = "";
   guardarEstado();
+  refrescarAcordeon(presupuesto);
 }
 
+function refrescarAcordeon(presupuesto) {
+  const pptoId = presupuesto.pptoId;
+  if (presupuesto.pagado) {
+    document.getElementById(`header-estimado-${pptoId}`).style.backgroundColor = 'honeydew';
+    document.getElementById(`titulo-estimado-${pptoId}`).innerHTML = `${presupuesto.detalle.toUpperCase()} [${presupuesto.pagado}]`;
+    document.getElementById(`restaurar-presupuesto-${pptoId}`).style.display = 'inline-block';
+    document.getElementById(`pagar-presupuesto-${pptoId}`).style.display = 'none';
+  } else {
+    document.getElementById(`header-estimado-${pptoId}`).style.backgroundColor = 'cornsilk';
+    document.getElementById(`titulo-estimado-${pptoId}`).innerHTML = `[Pendiente]`;
+    document.getElementById(`restaurar-presupuesto-${pptoId}`).style.display = 'none';
+    document.getElementById(`pagar-presupuesto-${pptoId}`).style.display = 'inline-block';
+  }
+}
 
-document.querySelector("#restaurar-todo-btn").addEventListener("click", function () {  
-  presupuestos.forEach(presupuesto => {       
-    restaurarPresupuesto(presupuesto.pptoId);
-  });
-});
 
 // Función para programar la ejecución diaria
 function programarAutopago(horaObjetivo) {

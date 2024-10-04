@@ -36,7 +36,7 @@ const dataConf = {
     { "tipo": "pago", "class": "pago", "alias": "Fecha de pago", "activo": false }
   ]
 };
-/*
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('./service-worker.js').then(function(registration) {
@@ -46,7 +46,7 @@ if ('serviceWorker' in navigator) {
     });
   });
 }
-*/
+
 
 let tarjetaPivot = 0;
 let movimientoPivot = 0;

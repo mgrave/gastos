@@ -1,25 +1,33 @@
 const cacheName = 'manyCache';
 const assetsToCache = [
-  '/',
-  '/index.html',
-  '/css/styles.css',
-  '/js/estimados.js',
-  '/js/movimientos.js',
-  '/js/opciones.js',
-  '/js/script.js',
-  '/js/tarjetas.js',
-  '/images/icon-192x192.png',
-  '/images/icon-512x512.png'
+  './',
+  './index.html',
+  './css/styles.css',
+  './js/estimados.js',
+  './js/movimientos.js',
+  './js/opciones.js',
+  './js/script.js',
+  './js/tarjetas.js',
+  './images/icon-192x192.png',
+  './images/icon-512x512.png'
 ];
 
-self.addEventListener('install', event => {
+self.addEventListener("install", (event) => {
+  console.log("Service Worker : Installed!")
+
   event.waitUntil(
-    caches.open(cacheName).then(cache => {
-      return cache.addAll(assetsToCache);
-    })
-  );
-  self.skipWaiting();
-});
+      
+      (async() => {
+          try {
+              cache_obj = await caches.open(cache)
+              cache_obj.addAll(caching_files)
+          }
+          catch{
+              console.log("error occured while caching...")
+          }
+      })()
+  )
+} )
 
 self.addEventListener('activate', event => {
   event.waitUntil(

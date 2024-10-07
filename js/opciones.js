@@ -112,7 +112,7 @@ function actualizarOpciones() {
   document.getElementById("transferencia-selector").value = "";  
   document.getElementById("opciones");
 	
-  if (fechaSeleccionada !== fechaActual || cuotasSelector.value !== "1" || transferencia.value !== "") {
+  if (fechaSeleccionada !== fechaActual || document.getElementById("cuotas-selector").value !== "1" || document.getElementById("transferencia-selector").value !== "") {
 	  document.getElementById("opciones").style.color = "red";
     formularioModificado = true;
   }else{

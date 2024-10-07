@@ -31,13 +31,13 @@ document
       cardId: seqCard,
       nombre: '',
       tipo: 'debito', // Valor por defecto
-      color: '',
+      color: 'black',
       factura: 0,
       pago: 0,
       control: 0,
       parcial: 0,
       balance: 0,
-      activo: true,
+      activo: false,
       nueva: true // Marca de que es una tarjeta nueva
     };
     tarjetas.unshift(nuevaTarjeta); // Agregar la nueva tarjeta al inicio del array
@@ -51,7 +51,12 @@ document
 function eliminarTarjeta(cardId) {
   // Filtrar las tarjetas para eliminar la tarjeta con el cardId especificado
   tarjetas = tarjetas.filter(t => t.cardId !== cardId);
-  //dataJson.tarjetas = tarjetas; //ORIG
+  let confirmacion = confirm("¿Deseas eliminar la tarjeta " + cardId + "?");
+
+  if (!confirmacion) {
+    // Si el usuario cancela, no realizar ninguna acción y salir de la función
+    return;
+  }
 
   // Filtrar los movimientos asociados a la tarjeta con el cardId especificado
   let movimientosCardId = movimientos.filter(movimiento => parseInt(movimiento.tarjeta) === parseInt(cardId));
@@ -98,10 +103,14 @@ function guardarTarjeta(cardId) {
     nombre = document.getElementById(`nombre-${cardId}`);
     tarjeta.tipo = document.getElementById(`tipo-${cardId}`).value || 'credito';
     tarjeta.color = document.getElementById(`color-${cardId}`).value || 'black';
-    tarjeta.balance = parseFloat(document.getElementById(`balance-${cardId}`).value) || 0; // Evitar NaN
     tarjeta.activo = document.getElementById(`activo-${cardId}`).checked; // Guardar estado de activo/inactivo    
-    tarjeta.nueva = false; // Si es nueva, ahora es tarjeta guardada
-    isNewCard = false;
+    tarjeta.balance = parseFloat(document.getElementById(`balance-${cardId}`).value) || 0; // Evitar NaN    
+    tarjeta.nueva = false; // Si es nueva, ahora es tarjeta guardada    
+    
+    if(isNewCard){
+      tarjeta.activo = true;
+      isNewCard = false;
+    }
 
     if (nombre.value === "") {
       nombre.classList.add('is-invalid');
@@ -241,8 +250,9 @@ function renderTarjetas() {
 
                 <div class="d-flex justify-content-between align-items-center  mt-2">
                   <!-- Switch para activar/desactivar tarjeta -->
-                  <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="activo-${cardId}" ${tarjeta.activo ? 'checked' : ''}>
+                   <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" role="switch" id="activo-${cardId}" 
+                          ${tarjeta.activo ? 'checked' : ''} ${tarjeta.nueva ? 'disabled' : ''}>
                     <label class="form-check-label" for="activo-${cardId}">Activada</label>
                   </div>
 

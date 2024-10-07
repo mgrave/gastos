@@ -224,7 +224,8 @@
     </div>
   </div>
 
-  <!-- Modal para gestionar estimados -->
+  <!-- Modal para gestionar presupuestos -->
+  
   <div class="modal fade" id="estimadosModal" tabindex="-1" role="dialog" aria-labelledby="estimadosModalLabel"
     aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -233,12 +234,19 @@
           <h5 class="modal-title" id="estimadosModalLabel">Presupuestos</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+
+
+
         <div class="modal-body">
           <!-- Botón para agregar una nueva simulación -->
           <div class="d-flex justify-content-between align-items-center mb-3">
             <button type="button" class="btn btn-success" id="agregar-presupuesto-btn">
               <i class="fa-solid fa-plus"></i>
             </button>
+            <div class="form-check form-switch">
+              <label class="form-check-label" for="presupuestosSwitch">Ocultar autopagos</label>
+              <input class="form-check-input" type="checkbox" id="presupuestosSwitch" role="switch">              
+            </div>
           </div>
 
           <!-- Contenedor para el acordeón de estimados -->

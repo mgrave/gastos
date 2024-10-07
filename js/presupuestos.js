@@ -1,17 +1,4 @@
-//todo
-/*
 
-
-el fondo del encabezado del acordeon debe ser verde claro si se ha pagado
-agregar un boton  restaurar 
-al agregar un nuevo pppto se debe abrir un nuevo acordeon por encima de los demas
-
-
-al eliminar debe confirmarse en un popup
-al guardar debe confirmarse en un popup
-el movId se genera al momento de pagar
-obtener los items con flag autopago
-si el dia del mes es igual o mayor a la fecha actual entonces agregar el movimiento*/
 // Agrega evento click al menú de lista
 document.querySelector("#estimados-menu").addEventListener("click", function () {
   $("#estimadosModal").modal("show");
@@ -233,17 +220,22 @@ function guardarPresupuesto(pptoId) {
 // Función para eliminar una simulación
 function eliminarEstimado(pptoId) {
   // Eliminar el acordeón visualmente
-  document.getElementById(`estimado-${id}`).remove();
-
-  // Eliminar del array de simulaciones
+  console.log("Presupuestosa: " + presupuestos.length);
   presupuestos = presupuestos.filter(sim => sim.pptoId !== pptoId);
+  let confirmacion = confirm("¿Deseas eliminar el presupuesto " + pptoId + "?");
 
+  if (!confirmacion) {
+    // Si el usuario cancela, no realizar ninguna acción y salir de la función
+    return;
+  }
+  console.log("Presupuestosb: " + presupuestos.length);
   // Verificar si la tarjeta eliminada es la que estaba abierta
   if (lastOpenedPptoId === pptoId) {
     lastOpenedPptoId = null; // Resetea el acordeón abierto
   }
 
   actualizarTotalEstimado();
+  renderPresupuesto();
   guardarEstado();
 }
 
@@ -309,11 +301,7 @@ document.querySelector("#pagar-pptos-btn").addEventListener("click", function ()
   }
 
 });
-// Función para actualizar la suma total de estimados
-function actualizarTotalEstimado() {
-  totalPresupuesto = presupuestos.reduce((total, presupuesto) => total + parseFloat(presupuesto.monto), 0);
-  document.getElementById('total-estimado').textContent = totalPresupuesto.toFixed(2);
-}
+
 
 // Función para obtener la fecha actual en formato año-mes-día
 function obtenerFechaActual() {
@@ -366,7 +354,7 @@ function refrescarAcordeon(presupuesto) {
     document.getElementById(`pagar-presupuesto-${pptoId}`).style.display = 'none';
   } else {
     document.getElementById(`header-estimado-${pptoId}`).style.backgroundColor = 'cornsilk';
-    document.getElementById(`titulo-estimado-${pptoId}`).innerHTML = `[Pendiente]`;
+    document.getElementById(`titulo-estimado-${pptoId}`).innerHTML = `${presupuesto.detalle.toUpperCase()} [Pendiente]`;
     document.getElementById(`restaurar-presupuesto-${pptoId}`).style.display = 'none';
     document.getElementById(`pagar-presupuesto-${pptoId}`).style.display = 'inline-block';
   }
@@ -395,6 +383,38 @@ function programarAutopago(horaObjetivo) {
     }, 24 * 60 * 60 * 1000 - Math.abs(tiempoRestante));
   }
 }
+
+// Función para ocultar/mostrar presupuestos con autopago
+function togglePresupuestosAutopago() {
+  const switchAutopago = document.getElementById('presupuestosSwitch');
+  const presupuestosAutopago = presupuestos.filter(p => p.autopago);
+  
+  presupuestosAutopago.forEach(presupuesto => {
+    const acordeon = document.getElementById(`estimadoAccordion-${presupuesto.pptoId}`);
+    if (acordeon) {
+      acordeon.style.display = switchAutopago.checked ? 'none' : 'block';
+    }
+  });
+  
+  actualizarTotalEstimado();
+}
+
+// Modificar la función actualizarTotalEstimado
+function actualizarTotalEstimado() {
+  const switchAutopago = document.getElementById('presupuestosSwitch');
+  totalPresupuesto = presupuestos.reduce((total, presupuesto) => {
+    if (!switchAutopago.checked || !presupuesto.autopago) {
+      return total + parseFloat(presupuesto.monto || 0);
+    }
+    return total;
+  }, 0);
+  
+  document.getElementById('total-estimado').textContent = totalPresupuesto.toFixed(2);
+}
+
+// Agregar evento al switch
+document.getElementById('presupuestosSwitch').addEventListener('change', togglePresupuestosAutopago);
+
 
 // Programar el autopago para las 2:00 AM
 const horaAutopago = new Date();

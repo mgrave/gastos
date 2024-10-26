@@ -1,0 +1,12 @@
+Funcionalidades
+- Ingreso y egreso de movimientos financieros
+- Registro de tarjetas (credito/debito)
+- Registro de ppresupuestos
+- Autopago de presupuesos
+- Pago en batch de presupuestos
+- Carga y descarga de backup
+- Concepto de gastos (Basico/Gusto/Ahorro)
+- Corte de facturacion (Solo en tarjeta de credito)
+- Indica fecha de pago (Solo en tarjeta de credito)
+- Se puede especificar cuotas
+- Transferencia de monto (Envio desde tarjeta origen a destino)

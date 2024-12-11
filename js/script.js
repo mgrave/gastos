@@ -418,8 +418,7 @@ document.addEventListener("DOMContentLoaded", function () {
   cargarEstado();
   cancelarOpciones();
   cambiarMovimiento();
-  cambiarTarjeta();
-  ejecutarAutopago();
+  cambiarTarjeta();  
   guardarEstado(); // Guardar el estado después de inicializar la página
 });
 

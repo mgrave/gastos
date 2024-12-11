@@ -146,9 +146,9 @@ function guardarPresupuesto(pptoId) {
     const montoInput = document.getElementById(`monto-estimado-${pptoId}`);
     const detalleInput = document.getElementById(`detalle-estimado-${pptoId}`);
     const diaInput = document.getElementById(`dia-estimado-${pptoId}`);
-    const autoPagoCheckbox = document.getElementById(`autopago-estimado-${pptoId}`);
-
+    const autoPagoCheckbox = document.getElementById(`autopago-estimado-${pptoId}`);    
     //completarFechaSimulacion(diaInput.value);
+
 
     ppto.tarjeta = tarjetaSelect.value;
     ppto.dia = diaInput.value;
@@ -250,8 +250,9 @@ function pagarPresupuesto(pptoId) {
     ? Math.max(...movimientos.map(t => t.movId)) + 1
     : 1;
 
-    const fechaActual = obtenerFechaSimulacion(presupuesto.dia); 
-
+    const fechaActual = obtenerFechaSimulacion(presupuesto.dia);     
+    const detail = presupuesto.autopago ? presupuesto.detalle + " [A]" : presupuesto.detalle;
+    
     const movimientoPago = {
       movId: idCounterMov,
       fecha: fechaActual,
@@ -259,7 +260,7 @@ function pagarPresupuesto(pptoId) {
       monto: parseInt(presupuesto.monto),
       concepto: presupuesto.concepto,
       tarjeta: parseInt(presupuesto.tarjeta),
-      detalle: presupuesto.detalle,
+      detalle: detail,
       pptoId: presupuesto.pptoId
     };
 
@@ -321,9 +322,8 @@ function obtenerFechaSimulacion(dia) {
 }
 
 // Función que ejecuta el autopago para las simulaciones pendientes
-function ejecutarAutopago() {
-  presupuestos.forEach(presupuesto => {
-    
+function ejecutarAutopago() {  
+  presupuestos.forEach(presupuesto => {    
     // Solo considerar simulaciones que tienen autopago activado    
     if (presupuesto.autopago && !presupuesto.pagado) {         
       const fechaActual = obtenerFechaActual(); // Obtener la fecha actual para las comparaciones
@@ -361,28 +361,7 @@ function refrescarAcordeon(presupuesto) {
 }
 
 
-// Función para programar la ejecución diaria
-function programarAutopago(horaObjetivo) {
-  const ahora = new Date();
-  const horaEjecucion = new Date();
-  horaEjecucion.setHours(horaObjetivo.getHours());
-  horaEjecucion.setMinutes(horaObjetivo.getMinutes());
-  horaEjecucion.setSeconds(0);
 
-  const tiempoRestante = horaEjecucion - ahora;
-  if (tiempoRestante > 0) {
-    setTimeout(() => {
-      ejecutarAutopago();
-      setInterval(ejecutarAutopago, 24 * 60 * 60 * 1000); // Ejecutar cada 24 horas
-    }, tiempoRestante);
-  } else {
-    console.log("La hora de autopago ya pasó hoy. Programando para mañana.");
-    setTimeout(() => {
-      ejecutarAutopago();
-      setInterval(ejecutarAutopago, 24 * 60 * 60 * 1000); // Ejecutar cada 24 horas
-    }, 24 * 60 * 60 * 1000 - Math.abs(tiempoRestante));
-  }
-}
 
 // Función para ocultar/mostrar presupuestos con autopago
 function togglePresupuestosAutopago() {
@@ -415,9 +394,9 @@ function actualizarTotalEstimado() {
 // Agregar evento al switch
 document.getElementById('presupuestosSwitch').addEventListener('change', togglePresupuestosAutopago);
 
-
-// Programar el autopago para las 2:00 AM
+//mover a script no ejecuta la tarea  
+// Programar el autopago para las 6:00 AM
 const horaAutopago = new Date();
-horaAutopago.setHours(2);
+horaAutopago.setHours(6);
 horaAutopago.setMinutes(0);
-//programarAutopago(horaAutopago);
+ejecutarTareas(horaAutopago);

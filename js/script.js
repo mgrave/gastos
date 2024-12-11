@@ -1,8 +1,14 @@
 //TODO
 //en fechas no se debe exceder el 31
-//confirmar antes de guardarar/eliminmar  
+//confirmar antes de guardar/eliminar  
 //eliminacion logica 
 //banner en nombres largos en el titulo
+//mostrar notificacion de limite superado con las TC
+//sumatoria de todas las deudas
+//reset de presupuestos autopagos, para que se puedan pagar automaticamente al siguiente mes
+//obtener tipo de cambio
+//obtener sumatoria por TCs, Servicios, Feria, Gustos
+
 
 var dataJson = {
   "tarjetas": [
@@ -256,6 +262,11 @@ function cargarEstado() {
 document
   .querySelector("#descargar_backup")
   .addEventListener("click", function () {
+    generarBackup();
+  });
+
+
+  function generarBackup(){
     console.log("Descargar backup... " + JSON.stringify(dataJson, null, 2))
     const datos = {
       tarjetas: tarjetas, //tarjetas: dataJson.tarjetas, //ORIG
@@ -267,12 +278,22 @@ document
     const json = JSON.stringify(datos, null, 2);
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
+    // Generar fecha en formato aaaammddhhmmss
+    const fecha = new Date();
+    const fechaFormato = fecha.getFullYear().toString() +
+      (fecha.getMonth() + 1).toString().padStart(2, '0') +
+      fecha.getDate().toString().padStart(2, '0') + "_" +
+      fecha.getHours().toString().padStart(2, '0') +
+      fecha.getMinutes().toString().padStart(2, '0') +
+      fecha.getSeconds().toString().padStart(2, '0');
+
+    const nombreArchivo = `many_${fechaFormato}.json`;
+
     const a = document.createElement("a");
     a.href = url;
-    a.download = "backup.json";
+    a.download = nombreArchivo; // Usar el nuevo nombre
     a.click();
-  });
-
+  }
 
 // Iniciar el proceso de selección del archivo
 document.querySelector("#cargar_backup").addEventListener("click", function () {
@@ -354,15 +375,41 @@ function onSignIn(googleUser) {
 }
 
 
-
-
-
 function signOut() {
   var auth2 = gapi.auth2.getAuthInstance();
   auth2.signOut().then(function () {
     updateUIForSignOut()
     console.log('User signed out.');
   });
+}
+
+function tareas(){    
+  ejecutarAutopago();
+  generarBackup();
+}
+
+// Función para programar la ejecución diaria
+function ejecutarTareas(horaObjetivo) {  
+  
+  const ahora = new Date();
+  const horaEjecucion = new Date();
+  horaEjecucion.setHours(horaObjetivo.getHours());
+  horaEjecucion.setMinutes(horaObjetivo.getMinutes());
+  horaEjecucion.setSeconds(0);
+
+  const tiempoRestante = horaEjecucion - ahora;
+  if (tiempoRestante > 0) {
+    setTimeout(() => {
+      tareas();      
+      setInterval(tareas, 4 * 60 * 60 * 1000 ); // Ejecutar cada 24 horas > 24 * 60 * 60 * 1000 // 10 segundos > 10 * 1000
+    }, tiempoRestante);
+  } else {
+    console.log("La hora de autopago ya pasó hoy. Programando para mañana.");
+    setTimeout(() => {
+      tareas();
+      setInterval(tareas, 4 * 60 * 60 * 1000 ); // Ejecutar cada 24 horas 24 * 60 * 60 * 1000
+    }, 4 * 60 * 60 * 1000  - Math.abs(tiempoRestante));
+  }
 }
 
 

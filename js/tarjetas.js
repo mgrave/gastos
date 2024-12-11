@@ -241,10 +241,14 @@ function renderTarjetas() {
                     <input type="number" class="form-control" id="pago-${cardId}" value="${tarjeta.pago || ''}" min="1" max="31">
                     <div class="invalid-feedback">La fecha de pago es obligatoria.</div>
                   </div>
+                  <div class="form-group">
+                    <label for="control-${cardId}">Limite de gasto</label>
+                    <input type="number" class="form-control" id="control-${cardId}" value="${tarjeta.control}">
+                  </div>
                 </div>
 
                 <div class="form-group">
-                  <label for="balance-${cardId}">Balance</label>
+                  <label for="balance-${cardId}">Monto usado</label>
                   <input type="number" class="form-control" id="balance-${cardId}" value="${tarjeta.balance}">
                 </div>
 

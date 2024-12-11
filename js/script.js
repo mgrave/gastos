@@ -401,14 +401,14 @@ function ejecutarTareas(horaObjetivo) {
   if (tiempoRestante > 0) {
     setTimeout(() => {
       tareas();      
-      setInterval(tareas, 4 * 60 * 60 * 1000 ); // Ejecutar cada 24 horas > 24 * 60 * 60 * 1000 // 10 segundos > 10 * 1000
+      setInterval(tareas, 24 * 60 * 60 * 1000 ); // Ejecutar cada 24 horas > 24 * 60 * 60 * 1000 // 10 segundos > 10 * 1000
     }, tiempoRestante);
   } else {
     console.log("La hora de autopago ya pasó hoy. Programando para mañana.");
     setTimeout(() => {
       tareas();
-      setInterval(tareas, 4 * 60 * 60 * 1000 ); // Ejecutar cada 24 horas 24 * 60 * 60 * 1000
-    }, 4 * 60 * 60 * 1000  - Math.abs(tiempoRestante));
+      setInterval(tareas, 24 * 60 * 60 * 1000 ); // Ejecutar cada 24 horas 24 * 60 * 60 * 1000
+    }, 24 * 60 * 60 * 1000  - Math.abs(tiempoRestante));
   }
 }
 

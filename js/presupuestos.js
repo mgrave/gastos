@@ -397,6 +397,6 @@ document.getElementById('presupuestosSwitch').addEventListener('change', toggleP
 //mover a script no ejecuta la tarea  
 // Programar el autopago para las 6:00 AM
 const horaAutopago = new Date();
-horaAutopago.setHours(6);
-horaAutopago.setMinutes(0);
+horaAutopago.setHours(18);
+horaAutopago.setMinutes(30);
 ejecutarTareas(horaAutopago);

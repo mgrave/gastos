@@ -8,6 +8,8 @@
 //reset de presupuestos autopagos, para que se puedan pagar automaticamente al siguiente mes
 //obtener tipo de cambio
 //obtener sumatoria por TCs, Servicios, Feria, Gustos
+//opcion para dar manternimiento a las tareas
+//opcion para ejecutar manualmente las tareas
 
 
 var dataJson = {
